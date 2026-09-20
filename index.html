@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luxz Store</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#09090B">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --bg:#09090B;
+    --bg-2:#0E0E11;
+    --panel:#15151A;
+    --panel-2:#1C1C22;
+    --border:#2A2A31;
+    --border-light:#3D3D46;
+    --text:#EDEDEF;
+    --text-dim:#9C9CA6;
+    --text-faint:#65656F;
+    --accent:#ADB3BF;
+    --accent-2:#6E7280;
+    --accent-pale:#E7E7EA;
+    --confirm:#16C79A;
+    --confirm-2:#0FA57F;
+    --price:#22C55E;
+    --danger:#EF4444;
+    --warn:#F59E0B;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow:0 12px 32px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:'Manrope',sans-serif;margin:0;}
+  p{margin:0;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  a{color:inherit;}
+  ::selection{background:var(--accent);color:#04121F;}
+
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  .header{position:sticky;top:0;z-index:40;background:rgba(7,13,24,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 20px;gap:12px;}
+  .logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,#22A6E8,#0B84C9);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .logo-text{font-weight:800;font-size:19px;letter-spacing:.2px;}
+  .logo-text span{color:#22A6E8;}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .icon-btn{width:40px;height:40px;border-radius:11px;background:var(--panel-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:.15s;}
+  .icon-btn:hover{color:var(--text);border-color:var(--border-light);}
+  .account-btn{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--border);padding:6px 12px 6px 6px;border-radius:12px;color:var(--text);position:relative;}
+  .avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(145deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#04121F;flex-shrink:0;}
+  .account-name{font-size:14px;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .btn{border:none;border-radius:11px;padding:10px 18px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;transition:.15s;white-space:nowrap;}
+  .btn-accent{background:var(--accent);color:#04121F;}
+  .btn-accent:hover{background:#3fb4ef;}
+  .btn-confirm{background:var(--confirm);color:#052e22;}
+  .btn-confirm:hover{background:#1fe0ae;}
+  .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border-light);}
+  .btn-outline:hover{border-color:var(--accent);}
+  .btn-ghost{background:var(--panel-2);color:var(--text-dim);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);}
+  .btn-danger{background:rgba(239,68,68,.12);color:#FF8080;border:1px solid rgba(239,68,68,.35);}
+  .btn-sm{padding:7px 12px;font-size:12.5px;border-radius:9px;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .dropdown{position:absolute;top:52px;right:0;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);min-width:230px;overflow:hidden;z-index:50;}
+  .dropdown-head{padding:14px;border-bottom:1px solid var(--border);}
+  .dropdown-head .name{font-weight:700;font-size:14.5px;}
+  .dropdown-head .mail{font-size:12.5px;color:var(--text-dim);margin-top:2px;}
+  .dropdown-item{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);}
+  .dropdown-item:last-child{border-bottom:none;}
+  .dropdown-item:hover{background:var(--panel);}
+  .dropdown-item.danger{color:#FF8080;}
+  .dropdown-item .tag{margin-left:auto;font-size:12px;color:var(--confirm);font-weight:700;}
+
+  .main{flex:1;max-width:1180px;margin:0 auto;width:100%;padding:22px 20px 90px;}
+
+  .hero{position:relative;overflow:hidden;border-radius:22px;background:radial-gradient(120% 140% at 15% 10%,#2E2E35 0%,#18181D 45%,#09090B 100%);border:1px solid var(--border);padding:38px 30px;margin-bottom:26px;}
+  .hero-eyebrow{color:var(--accent);font-weight:700;font-size:13px;margin-bottom:10px;}
+  .hero h1{font-size:34px;line-height:1.15;font-weight:800;max-width:560px;}
+  .hero p.sub{margin-top:12px;color:var(--text-dim);max-width:480px;font-size:15px;line-height:1.6;}
+  .hero-stats{display:flex;gap:26px;margin-top:24px;flex-wrap:wrap;}
+  .hero-stat b{font-size:22px;font-weight:800;display:block;}
+  .hero-stat span{font-size:12.5px;color:var(--text-faint);}
+
+  .search-bar{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--border);border-radius:13px;padding:12px 16px;margin-top:22px;color:var(--text-faint);}
+  .search-bar input{color:var(--text);font-size:14px;flex:1;}
+  .search-bar input::placeholder{color:var(--text-faint);}
+  .search-bar svg{flex-shrink:0;}
+  .banner{display:flex;align-items:flex-start;gap:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--warn);border-radius:12px;padding:13px 15px;margin-bottom:18px;font-size:13px;line-height:1.5;}
+  .banner svg{flex-shrink:0;margin-top:1px;width:20px;height:20px;}
+
+  .faq-item{border:1px solid var(--border);border-radius:13px;margin-bottom:10px;overflow:hidden;background:var(--panel);}
+  .faq-q{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;font-weight:700;font-size:14px;cursor:pointer;}
+  .faq-chev{color:var(--text-faint);transition:transform .2s;flex-shrink:0;display:flex;}
+  .faq-chev.open{transform:rotate(180deg);color:var(--accent);}
+  .faq-a{padding:0 16px 16px;color:var(--text-dim);font-size:13.5px;line-height:1.6;}
+
+  .tabs{display:flex;gap:8px;overflow-x:auto;margin:22px 0 18px;padding-bottom:4px;}
+  .tab{flex-shrink:0;background:var(--panel-2);border:1px solid var(--border);color:var(--text-dim);padding:9px 16px;border-radius:11px;font-weight:700;font-size:13.5px;}
+  .tab.active{background:var(--accent);color:#04121F;border-color:var(--accent);}
+
+  .section-title{font-size:22px;font-weight:800;margin:30px 0 4px;}
+  .section-sub{color:var(--text-faint);font-size:13.5px;margin-bottom:16px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:.15s;}
+  .card:hover{border-color:var(--border-light);}
+  .card-img{height:150px;background:linear-gradient(135deg,#1C1C22,#0E0E11);display:flex;align-items:center;justify-content:center;position:relative;}
+  .card-img img{width:100%;height:100%;object-fit:cover;}
+  .card-body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:7px;width:fit-content;}
+  .badge-verified{background:rgba(22,199,154,.14);color:var(--confirm);}
+  .badge-cat{background:rgba(173,179,191,.12);color:var(--accent);}
+  .badge-bestseller{background:rgba(245,158,11,.15);color:var(--warn);}
+  .badge-new{background:rgba(173,179,191,.15);color:var(--accent);}
+  .badge-sale{background:rgba(239,68,68,.15);color:var(--danger);}
+  .card-title{font-size:15.5px;font-weight:700;}
+  .card-desc{font-size:12.5px;color:var(--text-dim);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .card-price{color:var(--price);font-weight:800;font-size:15px;margin-top:auto;}
+  .card-price span{color:var(--text-faint);font-weight:500;font-size:11.5px;}
+  .card-actions{display:flex;gap:8px;margin-top:8px;}
+  .card-actions .btn{flex:1;justify-content:center;}
+  .fav-btn{position:absolute;top:9px;right:9px;width:34px;height:34px;border-radius:50%;background:rgba(4,10,20,.82);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#fff;transition:.15s;}
+  .fav-btn:hover{background:rgba(4,10,20,.95);}
+  .fav-btn.active{color:#FF5C7A;background:rgba(4,10,20,.9);}
+  .rating-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--warn);background:rgba(245,158,11,.12);padding:4px 9px;border-radius:7px;}
+  .rating-chip span{color:var(--text-faint);font-weight:600;}
+  .admin-card-actions{display:flex;gap:6px;position:absolute;top:8px;right:8px;}
+  .icon-chip{width:30px;height:30px;border-radius:8px;background:rgba(4,10,20,.7);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;color:var(--text);}
+  .icon-chip:hover{background:var(--accent);color:#04121F;}
+  .icon-chip.danger:hover{background:var(--danger);color:#fff;}
+
+  .empty-state{border:1px dashed var(--border-light);border-radius:var(--radius);padding:50px 20px;text-align:center;color:var(--text-dim);}
+  .empty-state svg{margin-bottom:10px;opacity:.55;}
+  .empty-state h3{color:var(--text);margin-bottom:6px;}
+
+  .props{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:44px;}
+  .prop{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+  .prop-icon{width:44px;height:44px;border-radius:12px;background:rgba(173,179,191,.12);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .prop h4{font-size:15px;margin-bottom:6px;}
+  .prop p{font-size:13px;color:var(--text-dim);line-height:1.5;}
+
+  .footer{border-top:1px solid var(--border);padding:30px 20px;margin-top:50px;text-align:center;color:var(--text-faint);font-size:12.5px;}
+  .footer .flinks{display:flex;justify-content:center;gap:18px;margin-bottom:14px;font-size:13px;color:var(--text-dim);font-weight:600;}
+  .footer .fsocials{display:flex;justify-content:center;gap:12px;margin-bottom:16px;}
+  .social-btn{width:52px;height:52px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:.15s;cursor:pointer;}
+  .social-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(173,179,191,.08);}
+
+  .fab{position:fixed;bottom:20px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(145deg,#22A6E8,#0B84C9);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(34,166,232,.35);z-index:60;border:none;color:#04121F;}
+
+  .auth-wrap{max-width:400px;margin:60px auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:30px;}
+  .auth-wrap h2{font-size:22px;margin-bottom:6px;}
+  .auth-wrap .sub{color:var(--text-dim);font-size:13.5px;margin-bottom:22px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:6px;}
+  .input{width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px;font-size:14px;outline:none;}
+  .input:focus{border-color:var(--accent);}
+  textarea.input{resize:vertical;min-height:70px;}
+  .auth-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FF9C9C;font-size:13px;padding:10px 12px;border-radius:9px;margin-bottom:14px;}
+  .auth-ok{background:rgba(22,199,154,.1);border:1px solid rgba(22,199,154,.3);color:#7BEFCB;font-size:13px;padding:10px 12px;border-radius:9px;margin-bottom:14px;}
+  .auth-hint{margin-top:16px;font-size:12px;color:var(--text-faint);background:var(--bg-2);border:1px solid var(--border);padding:10px 12px;border-radius:9px;}
+  .auth-switch{margin-top:18px;text-align:center;font-size:13.5px;color:var(--text-dim);}
+  .auth-switch b{color:var(--accent);cursor:pointer;}
+
+  @keyframes overlayFadeIn{ from{opacity:0;} to{opacity:1;} }
+  @keyframes modalPopIn{
+    from{ opacity:0; transform:translateY(28px) scale(.96); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .overlay{position:fixed;inset:0;background:rgba(3,7,14,.72);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:0;animation:overlayFadeIn .28s ease;}
+  .modal{background:var(--panel-2);border:1px solid var(--border);width:100%;max-width:520px;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);animation:modalPopIn .4s cubic-bezier(.16,1,.3,1);}
+  @media(min-width:640px){.overlay{align-items:center;padding:20px;} .modal{border-radius:18px;max-height:85vh;}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel-2);}
+  .modal-head h3{font-size:16.5px;display:flex;align-items:center;gap:9px;}
+  .modal-body{padding:20px;}
+  .modal-foot{display:flex;gap:10px;padding:16px 20px;border-top:1px solid var(--border);}
+  .modal-foot .btn{flex:1;justify-content:center;}
+  .close-x{background:none;border:none;color:var(--text-dim);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+  .close-x:hover{background:var(--panel);color:var(--text);}
+
+  .steps{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px 20px 0;}
+  .step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;background:var(--bg-2);color:var(--text-faint);border:1px solid var(--border);}
+  .step-dot.done{background:var(--confirm);color:#052e22;border-color:var(--confirm);}
+  .step-dot.current{background:var(--accent);color:#04121F;border-color:var(--accent);}
+  .step-line{width:26px;height:2px;background:var(--border);}
+
+  .variant-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--border);border-radius:11px;margin-bottom:9px;cursor:pointer;}
+  .variant-row.selected{border-color:var(--accent);background:rgba(173,179,191,.08);}
+  .variant-row.disabled{opacity:.4;cursor:not-allowed;}
+  .variant-left b{font-size:14px;display:block;}
+  .variant-left span{font-size:11.5px;color:var(--text-faint);}
+  .variant-price{color:var(--price);font-weight:800;font-size:14.5px;}
+  .radio{width:19px;height:19px;border-radius:50%;border:2px solid var(--border-light);flex-shrink:0;}
+  .variant-row.selected .radio{border-color:var(--accent);background:radial-gradient(circle,var(--accent) 0 40%,transparent 42%);}
+
+  .qty-box{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:11px;padding:12px 14px;margin-top:16px;}
+  .qty-controls{display:flex;align-items:center;gap:14px;}
+  .qty-btn{width:30px;height:30px;border-radius:8px;background:var(--panel);border:1px solid var(--border-light);color:var(--text);display:flex;align-items:center;justify-content:center;}
+  .qty-val{font-weight:800;min-width:18px;text-align:center;}
+
+  .buyer-box{border:1px solid var(--confirm);background:rgba(22,199,154,.06);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;}
+  .buyer-box .avatar{width:38px;height:38px;font-size:15px;}
+  .buyer-box .bname{font-weight:700;font-size:14.5px;}
+  .buyer-box .bline{font-size:12.5px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:2px;}
+
+  .pay-option{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;}
+  .pay-option.selected{border-color:var(--accent);background:rgba(173,179,191,.07);}
+  .pay-option .pl{display:flex;align-items:center;gap:12px;}
+  .pay-icon{width:38px;height:38px;border-radius:10px;background:var(--bg-2);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;}
+  .pay-name{font-weight:700;font-size:14px;}
+  .pay-sub{font-size:11.5px;color:var(--text-faint);}
+  .check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-light);display:flex;align-items:center;justify-content:center;color:transparent;}
+  .pay-option.selected .check{border-color:var(--accent);background:var(--accent);color:#04121F;}
+
+  .total-bar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#04121F;border-radius:12px;padding:14px 16px;margin:16px 0;font-weight:800;}
+  .total-bar span:first-child{display:flex;align-items:center;gap:8px;font-size:13.5px;}
+  .total-bar span:last-child{font-size:20px;}
+
+  .profile-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+  @media(max-width:760px){.profile-grid{grid-template-columns:1fr;}}
+  .balance-card{background:linear-gradient(120deg,var(--accent),var(--accent-2));border-radius:var(--radius);padding:20px;color:#04121F;}
+  .balance-card .lbl{font-size:12.5px;font-weight:700;opacity:.85;display:flex;align-items:center;gap:7px;}
+  .balance-card .amt{font-size:30px;font-weight:800;margin:8px 0 14px;}
+  .info-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:14px;}
+  .info-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+  .info-row:last-child{border-bottom:none;}
+  .info-row span:first-child{color:var(--text-faint);}
+  .order-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+  .order-dot{width:9px;height:9px;border-radius:50%;background:var(--confirm);flex-shrink:0;}
+  .order-info{flex:1;}
+  .order-info b{font-size:14px;}
+  .order-info div{font-size:11.5px;color:var(--text-faint);margin-top:2px;}
+  .order-price{color:var(--price);font-weight:800;}
+  .status-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+  .status-Pendiente{background:rgba(245,158,11,.15);color:var(--warn);}
+  .status-Enviado{background:rgba(173,179,191,.15);color:var(--accent);}
+  .status-Entregado{background:rgba(22,199,154,.15);color:var(--confirm);}
+  .status-Cancelado{background:rgba(239,68,68,.15);color:var(--danger);}
+
+  .admin-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+  .admin-menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;}
+  .admin-menu-tile{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;transition:.15s;cursor:pointer;}
+  .admin-menu-tile:hover{border-color:var(--accent);background:var(--panel-2);transform:translateY(-2px);}
+  .admin-menu-tile .tile-icon{width:48px;height:48px;border-radius:14px;background:rgba(173,179,191,.12);color:var(--accent);display:flex;align-items:center;justify-content:center;}
+  .admin-menu-tile .tile-label{font-weight:700;font-size:13px;line-height:1.25;}
+  .admin-menu-tile .tile-count{font-size:11.5px;color:var(--text-faint);font-weight:600;}
+
+  @keyframes glassIn{
+    from{ opacity:0; transform:translateY(34px) scale(.94); backdrop-filter:blur(0px) saturate(100%); -webkit-backdrop-filter:blur(0px) saturate(100%); }
+    to{ opacity:1; transform:translateY(0) scale(1); backdrop-filter:blur(26px) saturate(180%); -webkit-backdrop-filter:blur(26px) saturate(180%); }
+  }
+  .overlay.glass-overlay{align-items:center;padding:16px;background:rgba(3,7,14,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:overlayFadeIn .35s ease;}
+  .overlay.solid-black-overlay{align-items:center;padding:16px;background:#000;animation:overlayFadeIn .3s ease;}
+  .modal.glass-modal{
+    border-radius:24px;
+    max-height:82vh;
+    background:linear-gradient(150deg, rgba(255,255,255,.12), rgba(255,255,255,.02) 60%), rgba(16,29,48,.55);
+    backdrop-filter:blur(26px) saturate(180%);
+    -webkit-backdrop-filter:blur(26px) saturate(180%);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 25px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.15);
+    animation:glassIn .55s cubic-bezier(.16,1,.3,1);
+  }
+  .modal-head.glass-head{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.12);}
+  .modal-foot.glass-foot{background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.12);}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .stat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+  .stat-card .stat-label{font-size:12px;color:var(--text-faint);font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .stat-card .stat-value{font-size:22px;font-weight:800;}
+  .stat-card .stat-value small{font-size:12.5px;color:var(--text-faint);font-weight:600;}
+  .cat-add-row{display:flex;gap:8px;margin-bottom:16px;}
+  .cat-add-row .input{flex:1;}
+  .cat-chip{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+  .cat-chip span{flex:1;font-weight:600;font-size:13.5px;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);}
+  table{width:100%;border-collapse:collapse;min-width:640px;}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);padding:12px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);}
+  td{padding:12px 14px;font-size:13.5px;border-bottom:1px solid var(--border);color:var(--text);}
+  tr:last-child td{border-bottom:none;}
+  .role-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;}
+  .role-admin{background:rgba(173,179,191,.15);color:var(--accent);}
+  .role-owner{background:rgba(245,158,11,.18);color:var(--warn);}
+  .role-user{background:var(--panel);color:var(--text-dim);border:1px solid var(--border);}
+  .ban-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:rgba(239,68,68,.15);color:var(--danger);}
+  .ok-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:rgba(22,199,154,.15);color:var(--confirm);}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .variant-form-row{display:grid;grid-template-columns:1fr 90px 80px 34px;gap:8px;margin-bottom:8px;align-items:center;}
+  .variant-form-row .input{padding:9px 10px;font-size:13px;}
+  .toggle-row{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;margin:14px 0;}
+  .toggle{width:40px;height:23px;border-radius:20px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;}
+  .toggle.on{background:var(--confirm);}
+  .toggle::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.15s;}
+  .toggle.on::after{left:19px;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--border-light);color:var(--text);padding:12px 20px;border-radius:11px;box-shadow:var(--shadow);z-index:200;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;max-width:88vw;text-align:center;}
+
+  .center-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:14px;color:var(--text-dim);}
+  .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @media(max-width:600px){
+    .hero h1{font-size:26px;}
+    .account-name{display:none;}
+    .header{padding:12px 14px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   CONFIGURA TU PROYECTO DE SUPABASE AQUÍ
+   (Project Settings > API, en tu panel de Supabase)
+   ========================================================= */
+const SUPABASE_URL = 'https://egmrdpuhvvtgwbkxpypc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnbXJkcHVodnZ0Z3dia3hweXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MzA4MjEsImV4cCI6MjEwNDEwNjgyMX0.bGlMDMsMNcrEqh3a9rhqh7lpoB_5mfsqamOG2gcLUwE';
+
+const NEEDS_SETUP = SUPABASE_URL.includes('TU-PROYECTO') || SUPABASE_ANON_KEY.includes('TU-ANON-KEY');
+const sb = NEEDS_SETUP ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* Número de WhatsApp para el botón de soporte.
+   Formato: solo dígitos, con código de país, SIN "+", SIN espacios ni guiones.
+   Ejemplo Venezuela: '584121234567'  (58 = país, 412... = número) */
+const WHATSAPP_NUMBER = '584165146335';
+const WHATSAPP_MESSAGE = 'Hola, necesito ayuda con mi pedido en Luxz Store.';
+
+/* Enlaces de redes sociales para el pie de página.
+   Pega tus links completos (con https://) entre las comillas. */
+const SOCIAL_LINKS = {
+  whatsapp:  'https://chat.whatsapp.com/LbYcmjJxteIKYauEOVbAfv',
+  discord:   'https://discord.gg/8V8u5hWhh3',
+  tiktok:    'https://www.tiktok.com/@god_stich35?_r=1&_t=ZS-99UYrLELugk',
+  instagram: 'https://www.instagram.com/luxxz.gl?stkn=MXE0MDFkaG80bmM2bw==',
+};
+const SOCIAL_LABELS = { whatsapp:'WhatsApp', discord:'Discord', tiktok:'TikTok', instagram:'Instagram' };
+
+/* ---------------- ICONS ---------------- */
+const ic = {
+  droplet:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.32 0z"/></svg>',
+  user:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  gear:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 01-4 0v-.09A1.7 1.7 0 008.4 19.4a1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H2a2 2 0 010-4h.09A1.7 1.7 0 003.6 8.4a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H8a1.7 1.7 0 001-1.55V2a2 2 0 014 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V8a1.7 1.7 0 001.55 1H22a2 2 0 010 4h-.09a1.7 1.7 0 00-1.55 1z"/></svg>',
+  cart:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
+  wallet:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2v-5"/><path d="M16 12h5v4h-5a2 2 0 010-4z"/></svg>',
+  bag:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1.5 4M18 2l-1.5 4"/><path d="M3.5 8h17l-1.2 11a2 2 0 01-2 1.8H6.7a2 2 0 01-2-1.8z"/></svg>',
+  shield:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>',
+  headset:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>',
+  waIcon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 11-14.7-4.4L4 21l5.6-1.3A8 8 0 0020 12z"/><path d="M9 10c0 2.8 2.2 5 5 5"/></svg>',
+  discordIcon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="6"/><path d="M8 10v1M16 10v1"/><path d="M8 16c1.3.8 2.7 1.2 4 1.2S14.7 16.8 16 16"/><path d="M7 7l1-2.5c1.3.4 2.6.6 4 .6s2.7-.2 4-.6L17 7"/></svg>',
+  tiktokIcon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.5a3.5 3.5 0 11-3-3.46"/><path d="M14 4c0 2.5 2 4.5 4.5 4.5"/></svg>',
+  instaIcon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>',
+  truck:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="15" height="12" rx="1"/><path d="M16 10h4l3 3v5h-7z"/><circle cx="6" cy="20" r="1.6"/><circle cx="18.5" cy="20" r="1.6"/></svg>',
+  x:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  plus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  trash:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>',
+  edit:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
+  check:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  crown:'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19h20l-2-9-5 4-3-8-3 8-5-4z"/></svg>',
+  ban:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.5 5.5l13 13"/></svg>',
+  box:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  spray:'<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h4l1 3H8z"/><path d="M9 6v3l-2 2v10h8V11l-2-2V6"/><path d="M17 8l3-1M17 11l3 0M17 14l3 1"/></svg>',
+  spark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
+  alert:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg>',
+  flame:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 17a2.5 2.5 0 002.5-2.5c0-1.5-1.5-2-1-3.5 1 0 3 1.5 3 4a5.5 5.5 0 11-11 0c0-2 1-3.5 2-5 .5 1.5 1.5 1.5 2 1 .5-1-1-2 0-4 2 1 3 3 2 5.5-.5 1-.5 2 0 2.5z"/></svg>',
+  tagIcon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.6L12.7 20.5a2 2 0 01-2.8 0L3 13.6V3h10.6l7 7a2 2 0 010 2.6z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
+  key:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L20 3M20 3v4M20 3h-4"/></svg>',
+  eye:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+  search:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  heart:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>',
+  heartFilled:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>',
+  star:'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3 1.2-6.9-5-4.9 6.9-1z"/></svg>',
+  starOutline:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3 1.2-6.9-5-4.9 6.9-1z"/></svg>',
+};
+
+/* ---------------- STATE ---------------- */
+let state = {
+  view:'loading',
+  adminTab:'resumen',
+  users:[], products:[], purchases:[], logins:[], categories:[], paymentMethods:[], balanceHistory:[], topupRequests:[], licenses:[], licenseCounts:[], visitStats:null,
+  favorites:[], reviews:[], coupons:[],
+  siteSettings:{ logo_url:'' },
+  reviewForm:null, couponForm:null,
+  currentProfile:null,
+  activeCategory:'all',
+  searchQuery:'',
+  adminSearch:{ users:'', orders:'', products:'', licenses:'' },
+  openFaq:null,
+  modal:null,
+  lastOrder:null,
+  purchase:{ product:null, step:1, variantId:null, qty:1, payment:'balance', couponCode:'', couponInput:'', discount:0, couponErr:'' },
+  balanceMethod:null,
+  licenseProductId:null, licenseVariantLabel:'',
+  productForm:null,
+  pmForm:null,
+  userMenuOpen:false,
+  toast:null,
+  loginErr:'', registerErr:'', registerOk:'',
+  busy:false,
+};
+
+function uid(p){ return (p||'id') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s){ return (s===undefined||s===null) ? '' : String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n){ return '$' + Number(n||0).toFixed(2); }
+function fmtDate(d){ const dt=new Date(d); return dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
+
+function getUser(){ return state.currentProfile; }
+function isAdmin(){ const u=getUser(); return !!u && (u.role==='admin' || u.role==='owner'); }
+function isOwner(){ const u=getUser(); return !!u && u.role==='owner'; }
+function roleLabel(u){ return u.role==='owner'?'Propietario':u.role==='admin'?'Administrador':'Cliente'; }
+function lowestPrice(p){ if(!p.variants||!p.variants.length) return null; return Math.min(...p.variants.map(v=>Number(v.price))); }
+function effectiveStock(productId, variantLabel, fallback){
+  const lc = state.licenseCounts.find(x=>x.product_id===productId && x.variant_label===variantLabel);
+  if(lc && lc.total>0) return lc.available;
+  return fallback;
+}
+function isProductSoldOut(p){
+  if(!p.variants || !p.variants.length) return false;
+  return p.variants.every(v=>{
+    const stk = effectiveStock(p.id, v.label, v.stock);
+    return stk!=null && stk<=0;
+  });
+}
+function copyCode(code){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(()=>showToast('Código copiado.')).catch(()=>showToast('No se pudo copiar automáticamente.'));
+  } else {
+    showToast('Copia manual: ' + code);
+  }
+}
+
+function showToast(msg){
+  state.toast = msg;
+  render();
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ state.toast=null; render(); }, 3200);
+}
+
+/* ---------------- SUPABASE DATA LAYER ---------------- */
+async function fetchProfile(id){
+  const { data, error } = await sb.from('profiles').select('*').eq('id', id).single();
+  if(error) return null;
+  return data;
+}
+async function fetchProducts(){
+  const { data, error } = await sb.from('products').select('*').order('created_at', { ascending:true });
+  if(!error) state.products = data || [];
+}
+async function fetchUsers(){
+  if(!isAdmin()){ state.users = []; return; }
+  const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending:true });
+  if(!error) state.users = data || [];
+}
+async function fetchPurchases(){
+  const u = getUser();
+  if(!u){ state.purchases = []; return; }
+  let q = sb.from('purchases').select('*').order('created_at', { ascending:false });
+  if(!isAdmin()) q = q.eq('user_id', u.id);
+  const { data, error } = await q;
+  if(!error) state.purchases = data || [];
+}
+async function fetchLogins(){
+  if(!isAdmin()){ state.logins = []; return; }
+  const { data, error } = await sb.from('logins').select('*').order('created_at',{ ascending:false }).limit(80);
+  if(!error) state.logins = data || [];
+}
+async function fetchCategories(){
+  const { data, error } = await sb.from('categories').select('*').order('name', { ascending:true });
+  if(!error) state.categories = data || [];
+}
+async function fetchPaymentMethods(){
+  const { data, error } = await sb.from('payment_methods').select('*').order('created_at', { ascending:true });
+  if(!error) state.paymentMethods = data || [];
+}
+async function fetchBalanceHistory(){
+  const u = getUser();
+  if(!u){ state.balanceHistory = []; return; }
+  let q = sb.from('balance_transactions').select('*').order('created_at', { ascending:false }).limit(100);
+  if(!isAdmin()) q = q.eq('user_id', u.id);
+  const { data, error } = await q;
+  if(!error) state.balanceHistory = data || [];
+}
+async function fetchTopupRequests(){
+  const u = getUser();
+  if(!u){ state.topupRequests = []; return; }
+  let q = sb.from('topup_requests').select('*').order('created_at', { ascending:false }).limit(100);
+  if(!isAdmin()) q = q.eq('user_id', u.id);
+  const { data, error } = await q;
+  if(!error) state.topupRequests = data || [];
+}
+async function fetchLicenses(){
+  if(!isAdmin()){ state.licenses = []; return; }
+  const { data, error } = await sb.from('licenses').select('*').order('created_at', { ascending:true });
+  if(!error) state.licenses = data || [];
+}
+async function fetchLicenseCounts(){
+  const { data, error } = await sb.rpc('get_license_counts');
+  if(!error) state.licenseCounts = data || [];
+}
+function getVisitorId(){
+  try{
+    let id = localStorage.getItem('luxz_visitor_id');
+    if(!id){
+      id = 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2,10);
+      localStorage.setItem('luxz_visitor_id', id);
+    }
+    return id;
+  }catch(e){ return 'v_' + Date.now().toString(36); }
+}
+async function logVisit(){
+  try{
+    const last = localStorage.getItem('luxz_last_visit_logged');
+    const now = Date.now();
+    if(last && (now - Number(last)) < 30*60*1000) return; // no repetir antes de 30 min
+    const visitorId = getVisitorId();
+    const u = getUser();
+    await sb.from('page_visits').insert({ visitor_id: visitorId, user_id: u ? u.id : null });
+    localStorage.setItem('luxz_last_visit_logged', String(now));
+  }catch(e){ /* no bloquear la carga si falla */ }
+}
+async function fetchVisitStats(){
+  if(!isAdmin()){ state.visitStats = null; return; }
+  const { data, error } = await sb.rpc('get_visit_stats');
+  if(error || !data || !data[0]){ state.visitStats = null; return; }
+  const row = data[0];
+  state.visitStats = { total:Number(row.total), unique_visitors:Number(row.unique_visitors), today:Number(row.today), last_7_days:Number(row.last_7_days) };
+}
+async function fetchFavorites(){
+  const u = getUser();
+  if(!u){ state.favorites = []; return; }
+  const { data, error } = await sb.from('favorites').select('product_id').eq('user_id', u.id);
+  if(!error) state.favorites = (data||[]).map(f=>f.product_id);
+}
+async function fetchReviews(){
+  const { data, error } = await sb.from('reviews').select('*').order('created_at', { ascending:false });
+  if(!error) state.reviews = data || [];
+}
+async function fetchSiteSettings(){
+  const { data, error } = await sb.from('site_settings').select('*');
+  if(!error && data){
+    data.forEach(row=>{ state.siteSettings[row.key] = row.value || ''; });
+  }
+}
+async function uploadSiteAsset(file, keyPrefix){
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g,'') || 'png';
+  const path = keyPrefix + '_' + Date.now() + '.' + ext;
+  const { error } = await sb.storage.from('site-assets').upload(path, file, { upsert:false, cacheControl:'3600' });
+  if(error) throw error;
+  const { data } = sb.storage.from('site-assets').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function fetchCoupons(){
+  if(!isAdmin()){ state.coupons = []; return; }
+  const { data, error } = await sb.from('coupons').select('*').order('created_at', { ascending:false });
+  if(!error) state.coupons = data || [];
+}
+function productRating(productId){
+  const rs = state.reviews.filter(r=>r.product_id===productId);
+  if(!rs.length) return { avg:0, count:0 };
+  const avg = rs.reduce((s,r)=>s+r.rating,0) / rs.length;
+  return { avg, count:rs.length };
+}
+async function toggleFavorite(productId){
+  if(!getUser()){ state.view='login'; state.loginErr='Inicia sesión para guardar favoritos.'; return render(); }
+  const isFav = state.favorites.includes(productId);
+  if(isFav){
+    const { error } = await sb.from('favorites').delete().eq('user_id', getUser().id).eq('product_id', productId);
+    if(!error) state.favorites = state.favorites.filter(id=>id!==productId);
+    else { showToast('No se pudo actualizar: ' + error.message); return; }
+  } else {
+    const { error } = await sb.from('favorites').insert({ user_id: getUser().id, product_id: productId });
+    if(!error) state.favorites.push(productId);
+    else { showToast('No se pudo actualizar: ' + error.message); return; }
+  }
+  render();
+}
+async function refreshAfterAuth(){
+  await fetchProducts();
+  await fetchCategories();
+  await fetchPaymentMethods();
+  await fetchPurchases();
+  await fetchBalanceHistory();
+  await fetchTopupRequests();
+  await fetchLicenseCounts();
+  await fetchFavorites();
+  if(isAdmin()){ await fetchUsers(); await fetchLogins(); await fetchLicenses(); await fetchVisitStats(); await fetchCoupons(); } else { state.users=[]; state.logins=[]; state.licenses=[]; state.visitStats=null; state.coupons=[]; }
+}
+
+/* ---------------- INIT ---------------- */
+async function init(){
+  if(NEEDS_SETUP){ state.view='setup'; return render(); }
+  try{
+    const { data: { session } } = await sb.auth.getSession();
+    if(session){
+      const profile = await fetchProfile(session.user.id);
+      if(profile && !profile.banned) state.currentProfile = profile;
+      else if(profile && profile.banned) await sb.auth.signOut();
+    }
+  }catch(e){}
+  await fetchProducts();
+  await fetchCategories();
+  await fetchPaymentMethods();
+  await fetchLicenseCounts();
+  await fetchReviews();
+  await fetchSiteSettings();
+  if(state.currentProfile) await refreshAfterAuth();
+  state.view='store';
+  render();
+  logVisit();
+}
+
+/* ---------------- AUTH ---------------- */
+async function doLogin(){
+  const email = document.getElementById('li-mail').value.trim();
+  const password = document.getElementById('li-pass').value;
+  if(!email || !password){ state.loginErr='Completa correo y contraseña.'; return render(); }
+  state.busy = true; render();
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  state.busy = false;
+  if(error){ state.loginErr = 'No se pudo iniciar sesión: ' + error.message; return render(); }
+  const profile = await fetchProfile(data.user.id);
+  if(!profile){ state.loginErr='No se encontró tu perfil. Contacta con soporte.'; await sb.auth.signOut(); return render(); }
+  if(profile.banned){ state.loginErr='Esta cuenta está suspendida.'; await sb.auth.signOut(); return render(); }
+  state.currentProfile = profile;
+  state.loginErr='';
+  await sb.from('logins').insert({ user_id: profile.id, username: profile.username, role: profile.role });
+  await refreshAfterAuth();
+  state.view='store';
+  render();
+}
+
+async function doRegister(){
+  const username = document.getElementById('re-user').value.trim();
+  const email = document.getElementById('re-mail').value.trim();
+  const password = document.getElementById('re-pass').value;
+  if(!username || !email || !password){ state.registerErr='Completa todos los campos.'; return render(); }
+  if(password.length < 6){ state.registerErr='La contraseña debe tener al menos 6 caracteres.'; return render(); }
+  state.busy = true; render();
+  const { count } = await sb.from('profiles').select('id', { count:'exact', head:true }).eq('username', username);
+  if(count && count > 0){ state.busy=false; state.registerErr='Ese usuario ya existe.'; return render(); }
+  const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ username } } });
+  state.busy = false;
+  if(error){ state.registerErr='No se pudo crear la cuenta: ' + error.message; return render(); }
+  if(data.session){
+    let profile = null;
+    for(let i=0;i<5 && !profile;i++){
+      profile = await fetchProfile(data.user.id);
+      if(!profile) await new Promise(r=>setTimeout(r,400));
+    }
+    if(!profile){ state.registerErr='Cuenta creada, pero tu perfil tardó en generarse. Intenta iniciar sesión en unos segundos.'; state.view='login'; return render(); }
+    state.currentProfile = profile;
+    await sb.from('logins').insert({ user_id: data.user.id, username, role:'user' });
+    await refreshAfterAuth();
+    state.view='store';
+    showToast('Cuenta creada. ¡Bienvenido a Luxz Store!');
+  } else {
+    state.registerErr='';
+    state.registerOk='Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.';
+    state.view='login';
+    render();
+  }
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  state.currentProfile = null;
+  state.users=[]; state.purchases=[]; state.logins=[];
+  state.userMenuOpen = false;
+  state.view='store';
+  render();
+}
+
+/* ---------------- PURCHASE FLOW ---------------- */
+function openPurchase(productId){
+  if(!getUser()){ state.view='login'; state.loginErr='Inicia sesión para comprar.'; return render(); }
+  const product = state.products.find(p=>p.id===productId);
+  if(!product || isProductSoldOut(product)){ showToast('Este producto está agotado por ahora.'); return; }
+  state.modal='purchase';
+  state.purchase = { product, step:1, variantId:null, qty:1, payment:'balance', couponCode:'', couponInput:'', discount:0, couponErr:'' };
+  render();
+}
+function selectVariant(vid){ state.purchase.variantId=vid; render(); }
+function changeQty(d){
+  const v = state.purchase.product.variants.find(x=>x.id===state.purchase.variantId);
+  const stk = v ? effectiveStock(state.purchase.product.id, v.label, v.stock) : null;
+  const max = stk!=null ? stk : 99;
+  state.purchase.qty = Math.min(max, Math.max(1, state.purchase.qty + d));
+  render();
+}
+function purchaseNext(){
+  if(state.purchase.step===1 && !state.purchase.variantId){ showToast('Selecciona una opción para continuar.'); return; }
+  state.purchase.step = Math.min(3, state.purchase.step+1);
+  render();
+}
+function purchasePrev(){ state.purchase.step = Math.max(1, state.purchase.step-1); render(); }
+function setPaymentMethod(pm){ state.purchase.payment = pm; render(); }
+async function applyCoupon(){
+  const code = document.getElementById('purchase-coupon').value.trim();
+  if(!code){ showToast('Escribe un código.'); return; }
+  const variant = state.purchase.product.variants.find(v=>v.id===state.purchase.variantId);
+  const subtotal = Number(variant.price) * state.purchase.qty;
+  state.busy = true; render();
+  const { data, error } = await sb.rpc('compute_coupon_discount', { p_code: code, p_subtotal: subtotal });
+  state.busy = false;
+  if(error){ state.purchase.couponErr = error.message; state.purchase.couponCode=''; state.purchase.discount=0; return render(); }
+  state.purchase.couponCode = code;
+  state.purchase.couponInput = code;
+  state.purchase.discount = Number(data);
+  state.purchase.couponErr = '';
+  render();
+}
+function removeCoupon(){
+  state.purchase.couponCode = '';
+  state.purchase.couponInput = '';
+  state.purchase.discount = 0;
+  state.purchase.couponErr = '';
+  render();
+}
+async function notifyManualPayment(){
+  if(WHATSAPP_NUMBER.includes('TU-NUMERO')){ showToast('Falta configurar el número de WhatsApp (WHATSAPP_NUMBER) en el archivo.'); return; }
+  const { product, variantId, qty, payment } = state.purchase;
+  const variant = product.variants.find(v=>v.id===variantId);
+  const stk = effectiveStock(product.id, variant.label, variant.stock);
+  if(stk!=null && (stk<=0 || qty>stk)){ showToast('El stock disponible cambió. Ajusta la cantidad o elige otra opción.'); state.purchase.step=1; return render(); }
+  const method = state.paymentMethods.find(m=>m.id===payment);
+  const refInput = document.getElementById('purchase-ref');
+  const ref = refInput ? refInput.value.trim() : '';
+  state.busy = true; render();
+  const { data, error } = await sb.rpc('make_manual_order', {
+    p_product_id: product.id, p_variant_id: variantId, p_qty: qty,
+    p_payment_method: method ? method.name : 'Manual', p_binance_ref: ref, p_coupon_code: state.purchase.couponCode || ''
+  });
+  state.busy = false;
+  if(error){ showToast(error.message || 'No se pudo crear el pedido.'); return render(); }
+  await fetchProducts();
+  await fetchPurchases();
+  const total = Number(variant.price) * qty;
+  const orderRef = data && data.id ? data.id.slice(0,8).toUpperCase() : '';
+  const msg = 'Hola, quiero pagar mi pedido' + (orderRef ? ' #' + orderRef : '') + ' en Luxz Store:\n- Producto: ' + product.name +
+    ' (' + variant.label + ') x' + qty + '\n- Total: ' + money(total) + '\n- Método: ' + (method?method.name:'') +
+    (ref ? '\n- ID de transacción: ' + ref : '') + '\nAdjunto el comprobante de pago.';
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+  await fetchLicenseCounts();
+  state.lastOrder = data;
+  state.modal = 'orderSuccess';
+  render();
+}
+
+async function confirmPurchase(){
+  const { product, variantId, qty } = state.purchase;
+  const variant = product.variants.find(v=>v.id===variantId);
+  const stk = effectiveStock(product.id, variant.label, variant.stock);
+  if(stk!=null && (stk<=0 || qty>stk)){ showToast('El stock disponible cambió. Ajusta la cantidad o elige otra opción.'); state.purchase.step=1; return render(); }
+  state.busy = true; render();
+  const { data, error } = await sb.rpc('make_purchase', { p_product_id: product.id, p_variant_id: variantId, p_qty: qty, p_coupon_code: state.purchase.couponCode || '' });
+  state.busy = false;
+  if(error){ showToast(error.message || 'No se pudo completar la compra.'); return render(); }
+  state.currentProfile = await fetchProfile(getUser().id);
+  await fetchProducts();
+  await fetchPurchases();
+  await fetchLicenseCounts();
+  state.lastOrder = data;
+  state.modal = 'orderSuccess';
+  render();
+}
+
+/* ---------------- BALANCE ---------------- */
+function openAddBalance(){
+  state.modal='balance';
+  const first = state.paymentMethods.find(m=>m.enabled);
+  state.balanceMethod = first ? first.id : null;
+  render();
+}
+function setBalanceMethod(m){ state.balanceMethod = m; render(); }
+async function submitTopupRequest(){
+  const amt = Number(document.getElementById('bal-amt').value);
+  const ref = document.getElementById('bal-ref').value.trim();
+  const method = state.paymentMethods.find(m=>m.id===state.balanceMethod);
+  if(!amt || amt<=0){ showToast('Ingresa un monto válido.'); return; }
+  if(!ref){ showToast('Pega el ID de tu transacción de Binance Pay.'); return; }
+  state.busy = true; render();
+  const { error } = await sb.from('topup_requests').insert({
+    user_id: getUser().id, amount: amt, method: method?method.name:'Binance Pay', binance_ref: ref
+  });
+  state.busy = false;
+  if(error){ showToast('No se pudo enviar la solicitud: ' + error.message); return render(); }
+  await fetchTopupRequests();
+  state.modal = null;
+  if(!WHATSAPP_NUMBER.includes('TU-NUMERO')){
+    const msg = 'Hola, hice una recarga de ' + money(amt) + ' por ' + (method?method.name:'Binance Pay') + '.\nID de transacción: ' + ref;
+    window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+  }
+  showToast('Solicitud enviada. Se acreditará cuando confirmemos tu pago.');
+}
+async function adjustBalance(userId){
+  const amt = Number(document.getElementById('adj-amt-'+userId).value);
+  const reason = document.getElementById('adj-reason-'+userId).value.trim();
+  if(!amt){ showToast('Ingresa un monto distinto de cero (usa negativo para restar).'); return; }
+  const { error } = await sb.rpc('adjust_balance', { p_user_id: userId, p_amount: amt, p_reason: reason });
+  if(error){ showToast('No se pudo ajustar: ' + error.message); return; }
+  await fetchUsers();
+  await fetchBalanceHistory();
+  if(getUser().id===userId) state.currentProfile = await fetchProfile(userId);
+  showToast('Saldo ajustado correctamente.');
+}
+async function confirmTopupRequest(id){
+  const { error } = await sb.rpc('confirm_topup_request', { p_request_id: id });
+  if(error){ showToast('No se pudo confirmar: ' + error.message); return; }
+  await fetchTopupRequests();
+  await fetchUsers();
+  await fetchBalanceHistory();
+  showToast('Recarga confirmada, saldo acreditado.');
+}
+async function rejectTopupRequest(id){
+  if(!confirm('¿Rechazar esta solicitud de recarga?')) return;
+  const { error } = await sb.rpc('reject_topup_request', { p_request_id: id });
+  if(error){ showToast('No se pudo rechazar: ' + error.message); return; }
+  await fetchTopupRequests();
+  showToast('Solicitud rechazada.');
+}
+
+/* ---------------- LICENSES ---------------- */
+function selectLicenseProduct(id){ state.licenseProductId = id; state.licenseVariantLabel=''; render(); }
+function selectLicenseVariant(label){ state.licenseVariantLabel = label; render(); }
+async function addLicenses(){
+  const productId = document.getElementById('lic-product').value;
+  const variantLabel = document.getElementById('lic-variant').value;
+  const raw = document.getElementById('lic-bulk').value;
+  const codes = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!productId || !variantLabel){ showToast('Selecciona un producto y un plan.'); return; }
+  if(!codes.length){ showToast('Escribe al menos un código.'); return; }
+  const rows = codes.map(code=>({ product_id:productId, variant_label:variantLabel, code }));
+  const { error } = await sb.from('licenses').insert(rows);
+  if(error){ showToast('No se pudo agregar: ' + error.message); return; }
+  document.getElementById('lic-bulk').value = '';
+  await fetchLicenses();
+  render();
+  showToast(codes.length + ' licencia(s) agregada(s).');
+}
+async function deleteLicense(id){
+  if(!confirm('¿Eliminar esta licencia?')) return;
+  const { error } = await sb.from('licenses').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: ' + error.message); return; }
+  await fetchLicenses();
+  render();
+}
+
+/* ---------------- ADMIN: PRODUCTS ---------------- */
+let pendingLogoFile = null;
+async function saveSiteLogo(){
+  if(!pendingLogoFile){ showToast('Elige una imagen primero.'); return; }
+  state.busy = true; render();
+  try{
+    const url = await uploadSiteAsset(pendingLogoFile, 'logo');
+    const { error } = await sb.from('site_settings').upsert({ key:'logo_url', value:url, updated_at:new Date().toISOString() });
+    if(error) throw error;
+    state.siteSettings.logo_url = url;
+    pendingLogoFile = null;
+    showToast('Logo actualizado.');
+  }catch(err){
+    showToast('No se pudo guardar: ' + err.message);
+  }
+  state.busy = false;
+  render();
+}
+async function clearSiteLogo(){
+  if(!confirm('¿Quitar el logo actual y volver al ícono por defecto?')) return;
+  const { error } = await sb.from('site_settings').upsert({ key:'logo_url', value:'', updated_at:new Date().toISOString() });
+  if(error){ showToast('No se pudo actualizar: ' + error.message); return; }
+  state.siteSettings.logo_url = '';
+  pendingLogoFile = null;
+  render();
+}
+function renderAdminLogo(){
+  return `
+  <div style="max-width:360px;">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">Este logo se muestra en la parte superior de toda la tienda, para todos los visitantes.</div>
+    <div class="info-card" style="margin-top:0;display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="width:90px;height:90px;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;">
+        ${state.siteSettings.logo_url ? `<img id="logo-preview" src="${esc(state.siteSettings.logo_url)}" style="width:100%;height:100%;object-fit:cover;">` : `<span id="logo-preview-icon">${ic.droplet}</span>`}
+      </div>
+    </div>
+    <div class="field"><label>Nueva imagen de logo</label>
+      <input type="file" id="logo-file" accept="image/*" data-action="pickLogoFile" class="input" style="padding:9px;">
+      <div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Una imagen cuadrada funciona mejor. Máx. 5MB.</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-accent btn-sm" style="flex:1;" data-action="saveSiteLogo" ${state.busy?'disabled':''}>${state.busy?'Subiendo…':'Guardar logo'}</button>
+      ${state.siteSettings.logo_url ? `<button class="btn btn-danger btn-sm" data-action="clearSiteLogo">${ic.trash} Quitar</button>` : ''}
+    </div>
+  </div>`;
+}
+let pendingProductImageFile = null;
+function openProductForm(id){
+  pendingProductImageFile = null;
+  if(id){
+    const p = state.products.find(x=>x.id===id);
+    state.productForm = JSON.parse(JSON.stringify(p));
+  } else {
+    state.productForm = { id:null, name:'', category:'', description:'', image:'', verified:false, featured:'',
+      variants:[{ id:uid('var'), label:'', price:'', stock:'' }] };
+  }
+  state.modal='productForm';
+  render();
+}
+function clearProductImage(){
+  state.productForm.image = '';
+  pendingProductImageFile = null;
+  const fileInput = document.getElementById('pf-img-file');
+  if(fileInput) fileInput.value = '';
+  render();
+}
+async function uploadProductImage(file, productId){
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
+  const path = (productId || 'new') + '_' + Date.now() + '.' + ext;
+  const { error } = await sb.storage.from('product-images').upload(path, file, { upsert:false, cacheControl:'3600' });
+  if(error) throw error;
+  const { data } = sb.storage.from('product-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+function addVariantRow(){ state.productForm.variants.push({ id:uid('var'), label:'', price:'', stock:'' }); render(); }
+function removeVariantRow(vid){
+  state.productForm.variants = state.productForm.variants.filter(v=>v.id!==vid);
+  if(!state.productForm.variants.length) state.productForm.variants.push({ id:uid('var'), label:'', price:'', stock:'' });
+  render();
+}
+async function saveProductForm(){
+  const f = state.productForm;
+  f.name = document.getElementById('pf-name').value.trim();
+  f.category = document.getElementById('pf-cat').value.trim() || 'General';
+  f.featured = document.getElementById('pf-featured').value;
+  f.description = document.getElementById('pf-desc').value.trim();
+  f.variants.forEach(v=>{
+    v.label = document.getElementById('pv-label-'+v.id).value.trim();
+    v.price = document.getElementById('pv-price-'+v.id).value;
+    const stockVal = document.getElementById('pv-stock-'+v.id).value;
+    v.stock = stockVal==='' ? null : Number(stockVal);
+  });
+  f.variants = f.variants.filter(v=>v.label && v.price!=='' && !isNaN(Number(v.price)));
+  if(!f.name){ showToast('El producto necesita un nombre.'); return; }
+  if(!f.variants.length){ showToast('Agrega al menos una opción con precio.'); return; }
+  f.variants.forEach(v=>v.price=Number(v.price));
+
+  let imageUrl = f.image || '';
+  if(pendingProductImageFile){
+    state.busy = true; render();
+    try{
+      imageUrl = await uploadProductImage(pendingProductImageFile, f.id);
+    }catch(err){
+      state.busy = false;
+      showToast('No se pudo subir la imagen: ' + err.message);
+      return render();
+    }
+    state.busy = false;
+  }
+
+  const payload = { name:f.name, category:f.category, featured:f.featured, description:f.description, image:imageUrl, verified:f.verified, variants:f.variants };
+  let error;
+  if(f.id) ({ error } = await sb.from('products').update(payload).eq('id', f.id));
+  else ({ error } = await sb.from('products').insert(payload));
+  if(error){ showToast('No se pudo guardar: ' + error.message); return; }
+  pendingProductImageFile = null;
+  await fetchProducts();
+  state.modal=null; state.productForm=null;
+  showToast('Producto guardado.');
+}
+async function deleteProduct(id){
+  if(!confirm('¿Eliminar este producto del catálogo?')) return;
+  const { error } = await sb.from('products').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: ' + error.message); return; }
+  await fetchProducts();
+  render();
+}
+function toggleVerified(){ state.productForm.verified = !state.productForm.verified; render(); }
+
+/* ---------------- ADMIN: CATEGORIES ---------------- */
+async function addCategory(){
+  const input = document.getElementById('cat-new-name');
+  const name = input.value.trim();
+  if(!name){ showToast('Escribe un nombre de categoría.'); return; }
+  if(state.categories.find(c=>c.name.toLowerCase()===name.toLowerCase())){ showToast('Esa categoría ya existe.'); return; }
+  const { error } = await sb.from('categories').insert({ name });
+  if(error){ showToast('No se pudo agregar: ' + error.message); return; }
+  await fetchCategories();
+  render();
+}
+async function deleteCategory(id){
+  if(!confirm('¿Eliminar esta categoría? Los productos que ya la usan conservarán su nombre actual.')) return;
+  const { error } = await sb.from('categories').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: ' + error.message); return; }
+  await fetchCategories();
+  render();
+}
+
+/* ---------------- OWNER: PAYMENT METHODS ---------------- */
+function openPaymentMethodForm(id){
+  if(id){
+    const m = state.paymentMethods.find(x=>x.id===id);
+    state.pmForm = JSON.parse(JSON.stringify(m));
+  } else {
+    state.pmForm = { id:null, name:'', details:'', enabled:true };
+  }
+  state.modal='paymentMethodForm';
+  render();
+}
+function togglePmEnabled(){ state.pmForm.enabled = !state.pmForm.enabled; render(); }
+async function savePaymentMethodForm(){
+  const f = state.pmForm;
+  f.name = document.getElementById('pm-name').value.trim();
+  f.details = document.getElementById('pm-details').value.trim();
+  if(!f.name){ showToast('El método necesita un nombre.'); return; }
+  const payload = { name:f.name, details:f.details, enabled:f.enabled };
+  let error;
+  if(f.id) ({ error } = await sb.from('payment_methods').update(payload).eq('id', f.id));
+  else ({ error } = await sb.from('payment_methods').insert(payload));
+  if(error){ showToast('No se pudo guardar: ' + error.message); return; }
+  await fetchPaymentMethods();
+  state.modal=null; state.pmForm=null;
+  showToast('Método de pago guardado.');
+}
+async function togglePaymentMethod(id){
+  const m = state.paymentMethods.find(x=>x.id===id);
+  const { error } = await sb.from('payment_methods').update({ enabled: !m.enabled }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar: ' + error.message); return; }
+  await fetchPaymentMethods();
+  render();
+}
+async function deletePaymentMethod(id){
+  if(!confirm('¿Eliminar este método de pago?')) return;
+  const { error } = await sb.from('payment_methods').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: ' + error.message); return; }
+  await fetchPaymentMethods();
+  render();
+}
+
+/* ---------------- COUPONS ---------------- */
+function openCouponForm(id){
+  if(id){
+    const c = state.coupons.find(x=>x.id===id);
+    state.couponForm = { id:c.id, code:c.code, type:c.type, value:c.value, max_uses:c.max_uses, expires_at:c.expires_at?c.expires_at.slice(0,10):'', active:c.active };
+  } else {
+    state.couponForm = { id:null, code:'', type:'percent', value:'', max_uses:'', expires_at:'', active:true };
+  }
+  state.modal = 'couponForm';
+  render();
+}
+function toggleCouponFormActive(){ state.couponForm.active = !state.couponForm.active; render(); }
+async function saveCouponForm(){
+  const f = state.couponForm;
+  const code = document.getElementById('cp-code').value.trim().toUpperCase();
+  const type = document.getElementById('cp-type').value;
+  const value = Number(document.getElementById('cp-value').value);
+  const maxUsesRaw = document.getElementById('cp-max').value.trim();
+  const expiresRaw = document.getElementById('cp-expires').value;
+  if(!code){ showToast('El cupón necesita un código.'); return; }
+  if(!value || value<=0){ showToast('Ingresa un valor de descuento válido.'); return; }
+  const payload = {
+    code, type, value, active: f.active,
+    max_uses: maxUsesRaw==='' ? null : Number(maxUsesRaw),
+    expires_at: expiresRaw ? new Date(expiresRaw+'T23:59:59').toISOString() : null,
+  };
+  let error;
+  if(f.id) ({ error } = await sb.from('coupons').update(payload).eq('id', f.id));
+  else ({ error } = await sb.from('coupons').insert(payload));
+  if(error){ showToast('No se pudo guardar: ' + error.message); return; }
+  await fetchCoupons();
+  state.modal = null; state.couponForm = null;
+  showToast('Cupón guardado.');
+}
+async function toggleCouponActive(id){
+  const c = state.coupons.find(x=>x.id===id);
+  const { error } = await sb.from('coupons').update({ active: !c.active }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar: ' + error.message); return; }
+  await fetchCoupons();
+  render();
+}
+async function deleteCoupon(id){
+  if(!confirm('¿Eliminar este cupón?')) return;
+  const { error } = await sb.from('coupons').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: ' + error.message); return; }
+  await fetchCoupons();
+  render();
+}
+
+/* ---------------- OWNER: ROLE MANAGEMENT ---------------- */
+async function changeUserRole(id, newRole){
+  const target = state.users.find(x=>x.id===id);
+  if(!target) return;
+  if(target.role==='owner' && newRole!=='owner'){
+    const owners = state.users.filter(x=>x.role==='owner');
+    if(owners.length<=1){ showToast('Debe existir al menos un Owner.'); render(); return; }
+  }
+  if(target.id===getUser().id && newRole!=='owner' && !confirm('Vas a cambiar tu propio rol. ¿Continuar?')){ render(); return; }
+  const { error } = await sb.from('profiles').update({ role:newRole }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar: ' + error.message); render(); return; }
+  if(target.id===getUser().id) state.currentProfile = await fetchProfile(id);
+  await fetchUsers();
+  render();
+}
+
+/* ---------------- ADMIN: USERS ---------------- */
+async function toggleBan(id){
+  const target = state.users.find(x=>x.id===id);
+  if(target.id===getUser().id){ showToast('No puedes suspender tu propia cuenta.'); return; }
+  if(target.role==='owner' && !isOwner()){ showToast('Solo el Owner puede gestionar esta cuenta.'); return; }
+  const { error } = await sb.from('profiles').update({ banned: !target.banned }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar: ' + error.message); return; }
+  await fetchUsers();
+  render();
+}
+async function toggleAdmin(id){
+  const target = state.users.find(x=>x.id===id);
+  if(target.role==='owner'){ showToast('Solo el Owner puede gestionar esta cuenta.'); return; }
+  if(target.role==='admin'){
+    const admins = state.users.filter(x=>x.role==='admin');
+    if(admins.length<=1){ showToast('Debe existir al menos un administrador.'); return; }
+    if(target.id===getUser().id && !confirm('Vas a quitarte los permisos de administrador. ¿Continuar?')) return;
+  }
+  const newRole = target.role==='admin' ? 'user' : 'admin';
+  const { error } = await sb.from('profiles').update({ role:newRole }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar: ' + error.message); return; }
+  if(target.id===getUser().id) state.currentProfile = await fetchProfile(id);
+  await fetchUsers();
+  render();
+}
+
+/* ---------------- ADMIN: ORDERS ---------------- */
+async function setOrderStatus(id, status){
+  const { error } = await sb.from('purchases').update({ status }).eq('id', id);
+  if(error){ showToast('No se pudo actualizar el pedido: ' + error.message); return; }
+  const o = state.purchases.find(x=>x.id===id);
+  if(o) o.status = status;
+  render();
+}
+
+/* ---------------- PROFILE ---------------- */
+async function savePhone(){
+  const u = getUser();
+  const phone = document.getElementById('pf-phone').value.trim();
+  const { error } = await sb.from('profiles').update({ phone }).eq('id', u.id);
+  if(error){ showToast('No se pudo guardar: ' + error.message); return; }
+  state.currentProfile = await fetchProfile(u.id);
+  showToast('Teléfono actualizado.');
+}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  const app = document.getElementById('app');
+  const active = document.activeElement;
+  const activeId = (active && active.id) ? active.id : null;
+  const selStart = (active && typeof active.selectionStart === 'number') ? active.selectionStart : null;
+  const selEnd = (active && typeof active.selectionEnd === 'number') ? active.selectionEnd : null;
+  app.innerHTML = renderHeaderMaybe() + renderBody() + renderModal() + renderToast();
+  attachEvents();
+  if(activeId){
+    const el = document.getElementById(activeId);
+    if(el){
+      el.focus();
+      if(selStart!=null && el.setSelectionRange){ try{ el.setSelectionRange(selStart, selEnd); }catch(e){} }
+    }
+  }
+  window.scrollTo({top: state.__keepScroll?window.scrollY:0});
+  state.__keepScroll=false;
+}
+function renderHeaderMaybe(){
+  if(state.view==='setup' || state.view==='loading') return '';
+  return renderHeader();
+}
+function renderToast(){
+  if(!state.toast) return '';
+  return `<div class="toast">${ic.x}${esc(state.toast)}</div>`;
+}
+
+function renderHeader(){
+  const u = getUser();
+  let right = '';
+  if(u){
+    right = `
+      <button class="icon-btn" data-action="goto" data-view="${isAdmin()?'admin':'profile'}" title="${isAdmin()?'Panel admin':'Perfil'}">${ic.gear}</button>
+      <div style="position:relative;">
+        <button class="account-btn" data-action="toggleMenu">
+          <div class="avatar">${esc(u.username[0].toUpperCase())}</div>
+          <span class="account-name">${esc(u.username)}</span>
+          ${ic.chev}
+        </button>
+        ${state.userMenuOpen ? `
+        <div class="dropdown">
+          <div class="dropdown-head">
+            <div class="name">${esc(u.username)} ${u.role!=='user'?`<span style=\"color:var(--accent);font-size:11px;\">· ${roleLabel(u)}</span>`:''}</div>
+            <div class="mail">${esc(u.email)}</div>
+          </div>
+          <div class="dropdown-item" data-action="goto" data-view="profile">${ic.wallet} Saldo <span class="tag">${money(u.balance)}</span></div>
+          <div class="dropdown-item" data-action="goto" data-view="profile">${ic.bag} Mis pedidos</div>
+          <div class="dropdown-item" data-action="goto" data-view="favorites">${ic.heart} Favoritos</div>
+          <div class="dropdown-item" data-action="goto" data-view="profile">${ic.user} Perfil</div>
+          ${isAdmin() ? `<div class="dropdown-item" data-action="goto" data-view="admin">${ic.crown} Panel admin</div>` : ''}
+          <div class="dropdown-item danger" data-action="logout">${ic.x} Cerrar sesión</div>
+        </div>` : ''}
+      </div>`;
+  } else {
+    right = `
+      <button class="btn btn-outline btn-sm" data-action="goto" data-view="login">Iniciar sesión</button>
+      <button class="btn btn-accent btn-sm" data-action="goto" data-view="register">Registrarse</button>`;
+  }
+  return `
+  <div class="header">
+    <div class="logo" data-action="goto" data-view="store">
+      <div class="logo-mark">${state.siteSettings.logo_url ? `<img src="${esc(state.siteSettings.logo_url)}" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:11px;">` : ic.droplet}</div>
+      <div class="logo-text">LUXZ <span>STORE</span></div>
+    </div>
+    <div class="header-right">${right}</div>
+  </div>`;
+}
+
+function renderBody(){
+  if(state.view==='setup') return renderSetupScreen();
+  if(state.view==='loading') return `<div class="center-screen"><div class="spinner"></div><div>Cargando Luxz Store…</div></div>`;
+  if(state.view==='login') return renderAuth('login');
+  if(state.view==='register') return renderAuth('register');
+  if(state.view==='profile') return `<div class="main">${renderProfile()}</div>`;
+  if(state.view==='favorites') return `<div class="main">${renderFavoritesView()}</div>`;
+  if(state.view==='admin') return `<div class="main">${renderAdmin()}</div>`;
+  return `<div class="main">${renderStore()}</div>` + renderFooter() + renderFab();
+}
+
+function renderSetupScreen(){
+  return `<div class="center-screen" style="max-width:520px;margin:0 auto;text-align:center;">
+    ${ic.alert}
+    <h2>Falta conectar Supabase</h2>
+    <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">
+      Abre este archivo, busca <b>SUPABASE_URL</b> y <b>SUPABASE_ANON_KEY</b> al inicio del script,
+      y reemplázalos por los datos de tu proyecto (Project Settings → API en Supabase).
+      No olvides correr antes el script <b>supabase-setup.sql</b> en el editor SQL de tu proyecto.
+    </p>
+  </div>`;
+}
+
+function renderAuth(mode){
+  const login = mode==='login';
+  return `<div class="main">
+    <div class="auth-wrap">
+      <h2>${login?'Bienvenido de nuevo':'Crea tu cuenta'}</h2>
+      <div class="sub">${login?'Inicia sesión para continuar comprando en Luxz Store.':'Regístrate para empezar a comprar en Luxz Store.'}</div>
+      ${ login && state.registerOk ? `<div class="auth-ok">${esc(state.registerOk)}</div>` : '' }
+      ${ (login?state.loginErr:state.registerErr) ? `<div class="auth-err">${esc(login?state.loginErr:state.registerErr)}</div>` : '' }
+      ${login ? `
+        <div class="field"><label>Correo</label><input id="li-mail" type="email" class="input" placeholder="example123@correo.com" autocomplete="email"></div>
+        <div class="field"><label>Contraseña</label><input id="li-pass" type="password" class="input" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn btn-accent" style="width:100%;justify-content:center;" data-action="login" ${state.busy?'disabled':''}>${state.busy?'Entrando…':'Iniciar sesión'}</button>
+        <div class="auth-switch">¿No tienes cuenta? <b data-action="goto" data-view="register">Regístrate</b></div>
+      ` : `
+        <div class="field"><label>Usuario</label><input id="re-user" class="input" placeholder="username"></div>
+        <div class="field"><label>Correo</label><input id="re-mail" type="email" class="input" placeholder="example123@correo.com"></div>
+        <div class="field"><label>Contraseña</label><input id="re-pass" type="password" class="input" placeholder="Mínimo 6 caracteres"></div>
+        <button class="btn btn-accent" style="width:100%;justify-content:center;" data-action="register" ${state.busy?'disabled':''}>${state.busy?'Creando…':'Crear cuenta'}</button>
+        <div class="auth-switch">¿Ya tienes cuenta? <b data-action="goto" data-view="login">Inicia sesión</b></div>
+      `}
+      <div class="auth-hint">Compras seguras y soporte real en cada pedido que realizas en Luxz Store.</div>
+    </div>
+  </div>`;
+}
+
+function renderStore(){
+  const cats = ['all', ...new Set(state.products.map(p=>p.category))];
+  const q = state.searchQuery.trim().toLowerCase();
+  let visible = state.activeCategory==='all' ? state.products : state.products.filter(p=>p.category===state.activeCategory);
+  if(q) visible = visible.filter(p=> (p.name||'').toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q));
+  return `
+  <div class="hero">
+    <div class="hero-eyebrow">LUXZ STORE · TU MEJOR OPCIÓN</div>
+    <h1>Tienda digital de tus Cheats favoritos para todos los dispositivos moviles.</h1>
+    <p class="sub">Priorizamos la transparencia, la estabilidad y la satisfacción del usuario. Ofrecemos soporte técnico especializado, guías de instalación paso a paso y un entorno seguro para que cada jugador pueda maximizar su potencial competitivo con total tranquilidad.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><b>${state.products.length}</b><span>Productos activos</span></div>
+      <div class="hero-stat"><b>${state.purchases.length}</b><span>${isAdmin()?'Pedidos totales':'Tus pedidos'}</span></div>
+    </div>
+  </div>
+
+  ${state.products.length ? `
+  <div class="search-bar">
+    ${ic.search}
+    <input id="store-search" class="input" style="border:none;background:transparent;padding:0;" placeholder="Buscar productos..." value="${esc(state.searchQuery)}">
+    ${state.searchQuery ? `<button class="icon-btn" style="width:30px;height:30px;flex-shrink:0;" data-action="clearSearch">${ic.x}</button>` : ''}
+  </div>
+  <div class="tabs">
+    ${cats.map(c=>`<button class="tab ${state.activeCategory===c?'active':''}" data-action="setCategory" data-cat="${esc(c)}">${c==='all'?'Todos':esc(c)}</button>`).join('')}
+  </div>` : ''}
+
+  ${ visible.length ? `<div class="grid">${visible.map(renderProductCard).join('')}</div>` : (q ? `<div class="empty-state">${ic.search}<h3>Sin resultados</h3><p>No encontramos productos que coincidan con "${esc(state.searchQuery)}".</p></div>` : renderEmptyCatalog()) }
+
+  <div class="props">
+    <div class="prop"><div class="prop-icon">${ic.truck}</div><h4>Entrega rápida</h4><p>Recibe tus productos seleccionados en tiempo récord, listos para usar.</p></div>
+    <div class="prop"><div class="prop-icon">${ic.headset}</div><h4>Soporte real</h4><p>Nuestro equipo te ayuda con cualquier duda sobre tu pedido o pago.</p></div>
+    <div class="prop"><div class="prop-icon">${ic.shield}</div><h4>Compra segura</h4><p>Pagos protegidos y seguimiento claro de cada pedido que realizas.</p></div>
+  </div>
+
+  ${renderAboutSection()}
+  ${renderFaqSection()}`;
+}
+
+function renderAboutSection(){
+  return `
+  <div class="section-title">Sobre nosotros</div>
+  <div class="section-sub">Quiénes somos y qué nos hace diferentes</div>
+  <div class="prop" style="max-width:100%;">
+    <p style="color:var(--text-dim);font-size:14px;line-height:1.7;">
+      Luxz Store nació con una idea simple: ofrecer productos de calidad con una experiencia de compra clara, rápida y sin sorpresas.
+      Cuidamos cada pedido de principio a fin, desde que lo eliges hasta que lo tienes en tus manos, con soporte real detrás de cada mensaje.
+    </p>
+  </div>`;
+}
+
+function renderFaqSection(){
+  const faqs = [
+    { q:'¿Cómo pago mi pedido?', a:'Puedes pagar con tu saldo de la tienda, o con los métodos de pago manuales disponibles (como Binance Pay), verificando el pago con el ID de tu transacción.' },
+    { q:'¿Cuánto tarda la entrega?', a:'Depende del producto. Los productos con código/licencia se entregan al instante una vez confirmado el pago; el resto según lo acordado en tu pedido.' },
+    { q:'¿Puedo recibir soporte?', a:'Sí, usa el botón flotante de soporte para escribirnos directo por WhatsApp con tu duda.' },
+    { q:'¿Qué pasa si mi pago manual no se confirma rápido?', a:'Los pagos manuales se revisan a la brevedad. Si tarda, contáctanos con tu ID de transacción para agilizarlo.' },
+  ];
+  return `
+  <div class="section-title">Preguntas frecuentes</div>
+  <div class="section-sub">Lo que más nos preguntan nuestros clientes</div>
+  ${faqs.map((f,i)=>`
+    <div class="faq-item">
+      <div class="faq-q" data-action="toggleFaq" data-i="${i}">
+        <span>${esc(f.q)}</span>
+        <span class="faq-chev ${state.openFaq===i?'open':''}">${ic.chev}</span>
+      </div>
+      ${state.openFaq===i ? `<div class="faq-a">${esc(f.a)}</div>` : ''}
+    </div>`).join('')}
+  `;
+}
+
+function renderEmptyCatalog(){
+  return `<div class="empty-state">
+    ${ic.box}
+    <h3>El catálogo todavía está vacío</h3>
+    <p>${isAdmin() ? 'Agrega tu primer producto desde el panel de administración.' : 'Vuelve pronto, estamos preparando nuevos productos.'}</p>
+    ${isAdmin() ? `<button class="btn btn-accent btn-sm" style="margin-top:16px;" data-action="goto" data-view="admin" data-atab="products">${ic.plus} Agregar producto</button>` : ''}
+  </div>`;
+}
+
+function renderProductImage(p){
+  if(p.image) return `<img src="${esc(p.image)}" alt="${esc(p.name)}" onerror="this.style.display='none';this.parentNode.querySelector('.ph').style.display='flex';"><div class="ph" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--accent);">${ic.spray}</div>`;
+  return `<div style="color:var(--accent);">${ic.spray}</div>`;
+}
+
+function renderProductCard(p){
+  const price = lowestPrice(p);
+  const soldOut = isProductSoldOut(p);
+  const isFav = state.favorites.includes(p.id);
+  const rating = productRating(p.id);
+  return `<div class="card">
+    <div class="card-img">
+      ${renderProductImage(p)}
+      <button class="fav-btn ${isFav?'active':''}" data-action="toggleFavorite" data-id="${p.id}" title="${isFav?'Quitar de favoritos':'Agregar a favoritos'}">${isFav?ic.heartFilled:ic.heart}</button>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <span class="badge badge-cat">${esc(p.category)}</span>
+        ${p.verified ? `<span class="badge badge-verified">${ic.check} Verificado</span>` : ''}
+        ${p.featured==='bestseller' ? `<span class="badge badge-bestseller">${ic.flame} Más vendido</span>` : ''}
+        ${p.featured==='new' ? `<span class="badge badge-new">${ic.gear} Nuevo</span>` : ''}
+        ${p.featured==='sale' ? `<span class="badge badge-sale">${ic.tagIcon} En oferta</span>` : ''}
+        ${soldOut ? `<span class="badge" style="background:rgba(239,68,68,.15);color:var(--danger);">Agotado</span>` : ''}
+        ${rating.count ? `<span class="rating-chip">${ic.star} ${rating.avg.toFixed(1)} <span>(${rating.count})</span></span>` : ''}
+      </div>
+      <div class="card-title">${esc(p.name)}</div>
+      ${p.description ? `<div class="card-desc">${esc(p.description)}</div>` : ''}
+      <div class="card-price">${price!=null?money(price):'—'} <span>desde</span></div>
+      <div class="card-actions">
+        <button class="btn btn-accent btn-sm" style="flex:1;" data-action="openPurchase" data-id="${p.id}" ${soldOut?'disabled':''}>${ic.cart} ${soldOut?'Agotado':'Comprar'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFooter(){
+  return `<div class="footer">
+    <div class="flinks"><span>Privacidad</span><span>Términos</span><span>Contacto</span></div>
+    <div class="fsocials">
+      <div class="social-btn" data-action="social" data-key="whatsapp" title="Grupo de WhatsApp">${ic.waIcon}</div>
+      <div class="social-btn" data-action="social" data-key="discord" title="Servidor de Discord">${ic.discordIcon}</div>
+      <div class="social-btn" data-action="social" data-key="tiktok" title="TikTok">${ic.tiktokIcon}</div>
+      <div class="social-btn" data-action="social" data-key="instagram" title="Instagram">${ic.instaIcon}</div>
+    </div>
+    © 2026 Luxz Store · Compra 100% segura
+  </div>`;
+}
+function renderFab(){ return `<button class="fab" data-action="fabSupport" title="Soporte">${ic.headset}</button>`; }
+
+function renderModal(){
+  if(state.modal==='purchase') return renderPurchaseModal();
+  if(state.modal==='balance') return renderBalanceModal();
+  if(state.modal==='productForm') return renderProductFormModal();
+  if(state.modal==='paymentMethodForm') return renderPaymentMethodFormModal();
+  if(state.modal==='orderSuccess') return renderOrderSuccessModal();
+  if(state.modal==='adminSection') return renderAdminSectionModal();
+  if(state.modal==='reviewForm') return renderReviewFormModal();
+  if(state.modal==='couponForm') return renderCouponFormModal();
+  return '';
+}
+
+function openReviewForm(productId, productName){
+  const u = getUser();
+  const existing = state.reviews.find(r=>r.product_id===productId && r.user_id===u.id);
+  state.reviewForm = { productId, productName, rating: existing?existing.rating:5, comment: existing?existing.comment:'' };
+  state.modal = 'reviewForm';
+  render();
+}
+function setReviewRating(n){ state.reviewForm.rating = n; render(); }
+async function submitReview(){
+  const f = state.reviewForm;
+  const comment = document.getElementById('review-comment').value.trim();
+  state.busy = true; render();
+  const { error } = await sb.rpc('add_review', { p_product_id: f.productId, p_rating: f.rating, p_comment: comment });
+  state.busy = false;
+  if(error){ showToast(error.message || 'No se pudo enviar la reseña.'); return render(); }
+  await fetchReviews();
+  state.modal = null; state.reviewForm = null;
+  showToast('¡Gracias por tu reseña!');
+}
+function renderReviewFormModal(){
+  const f = state.reviewForm;
+  return `<div class="overlay glass-overlay" data-action="closeModalBg">
+    <div class="modal glass-modal" style="max-width:440px;">
+      <div class="modal-head glass-head"><h3>${ic.star} Reseñar ${esc(f.productName)}</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;">
+          ${[1,2,3,4,5].map(n=>`<button type="button" style="background:none;border:none;color:${n<=f.rating?'var(--warn)':'var(--border)'};cursor:pointer;" data-action="setReviewRating" data-n="${n}">${n<=f.rating?ic.star.replace('width="13" height="13"','width="26" height="26"'):ic.starOutline}</button>`).join('')}
+        </div>
+        <div class="field"><label>Comentario (opcional)</label><textarea id="review-comment" class="input" placeholder="¿Qué te pareció?">${esc(f.comment)}</textarea></div>
+      </div>
+      <div class="modal-foot glass-foot">
+        <button class="btn btn-confirm" style="width:100%;" data-action="submitReview" ${state.busy?'disabled':''}>${state.busy?'Enviando…':'Enviar reseña'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderOrderSuccessModal(){
+  const o = state.lastOrder;
+  if(!o) return '';
+  const codesReady = o.payment_method==='Saldo' || o.status!=='Pendiente';
+  const hasCodes = o.license_codes && o.license_codes.length;
+  return `<div class="overlay solid-black-overlay" data-action="closeModalBg">
+    <div class="modal glass-modal" style="max-width:460px;">
+      <div class="modal-head glass-head"><h3>${ic.check} Pedido confirmado</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div class="info-card" style="margin-top:0;">
+          <div class="info-row"><span>Producto</span><span>${esc(o.product_name)}</span></div>
+          <div class="info-row"><span>Plan</span><span>${esc(o.variant_label)}</span></div>
+          <div class="info-row"><span>Cantidad</span><span>${o.qty}</span></div>
+          <div class="info-row"><span>Total</span><span style="color:var(--price);font-weight:800;">${money(o.price)}</span></div>
+          <div class="info-row"><span>Método</span><span>${esc(o.payment_method)}</span></div>
+          <div class="info-row"><span>Estado</span><span class="status-pill status-${o.status}">${o.status}</span></div>
+          <div class="info-row"><span>N.º de pedido</span><span style="font-family:monospace;">${o.id.slice(0,8).toUpperCase()}</span></div>
+          ${ o.coupon_code ? `<div class="info-row"><span>Cupón</span><span style="color:var(--confirm);">${esc(o.coupon_code)} (-${money(o.discount_amount||0)})</span></div>` : '' }
+        </div>
+        ${ codesReady ? (hasCodes ? `
+          <div style="margin-top:16px;">
+            <div style="font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">${ic.key} TU(S) CÓDIGO(S)</div>
+            ${o.license_codes.map(c=>`
+              <div style="display:flex;align-items:center;gap:8px;background:rgba(22,199,154,.08);border:1px solid rgba(22,199,154,.25);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+                <span style="flex:1;font-family:monospace;font-size:14px;color:var(--confirm);word-break:break-all;">${esc(c)}</span>
+                <button class="btn btn-ghost btn-sm" data-action="copyCode" data-code="${esc(c)}">Copiar</button>
+              </div>`).join('')}
+          </div>` : '') : `<div class="auth-hint" style="margin-top:16px;">Tu código se mostrará aquí en cuanto confirmemos tu pago.</div>`
+        }
+      </div>
+      <div class="modal-foot glass-foot">
+        <button class="btn btn-confirm" style="width:100%;" data-action="closeModal">Listo</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPurchaseModal(){
+  const { product, step, variantId, qty, payment } = state.purchase;
+  const variant = product.variants.find(v=>v.id===variantId);
+  const subtotal = variant ? Number(variant.price)*qty : 0;
+  const discount = Math.min(state.purchase.discount || 0, subtotal);
+  const total = subtotal - discount;
+  const u = getUser();
+  return `<div class="overlay glass-overlay" data-action="closeModalBg">
+    <div class="modal glass-modal">
+      <div class="modal-head glass-head">
+        <h3>${ic.bag} ${esc(product.name)}</h3>
+        <button class="close-x" data-action="closeModal">${ic.x}</button>
+      </div>
+      <div class="steps">
+        ${[1,2,3].map(s=>`<span class="step-dot ${s<step?'done':s===step?'current':''}">${s<step?ic.check:s}</span>${s<3?'<span class="step-line"></span>':''}`).join('')}
+      </div>
+      <div class="modal-body">
+        ${step===1 ? `
+          <div style="font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:10px;">SELECCIONA UNA OPCIÓN</div>
+          ${product.variants.map(v=>{
+            const stk = effectiveStock(product.id, v.label, v.stock);
+            const soldOut = stk!=null && stk<=0;
+            return `<div class="variant-row ${variantId===v.id?'selected':''} ${soldOut?'disabled':''}" ${soldOut?'':`data-action="selectVariant" data-vid="${v.id}"`}>
+              <div class="variant-left"><b>${esc(v.label)}</b><span>${soldOut?'Agotado':(stk!=null?('Stock: '+stk):'Disponible')}</span></div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span class="variant-price">${money(v.price)}</span><span class="radio"></span>
+              </div>
+            </div>`;
+          }).join('')}
+          <div class="qty-box">
+            <div><b style="font-size:13.5px;">${ic.cart} Cantidad</b></div>
+            <div class="qty-controls">
+              <button class="qty-btn" data-action="qty" data-d="-1">${ic.minus}</button>
+              <span class="qty-val">${qty}</span>
+              <button class="qty-btn" data-action="qty" data-d="1">${ic.plus}</button>
+            </div>
+          </div>
+          ${renderProductReviews(product.id)}
+        ` : ''}
+        ${step===2 ? `
+          <div style="font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:10px;">DATOS DEL COMPRADOR</div>
+          <div class="buyer-box">
+            <div class="avatar">${esc(u.username[0].toUpperCase())}</div>
+            <div>
+              <div class="bname">${esc(u.username)}</div>
+              <div class="bline">${esc(u.email)}</div>
+              ${u.phone ? `<div class="bline">${esc(u.phone)}</div>` : ''}
+            </div>
+          </div>
+          <div style="margin-top:14px;font-size:12.5px;color:var(--text-faint);">Resumen: ${esc(variant.label)} × ${qty} — <b style="color:var(--price);">${money(total)}</b></div>
+        ` : ''}
+        ${step===3 ? `
+          <div style="font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:10px;">MÉTODO DE PAGO</div>
+          <div class="pay-option ${payment==='balance'?'selected':''}" data-action="setPaymentMethod" data-pm="balance">
+            <div class="pl"><div class="pay-icon">${ic.wallet}</div><div><div class="pay-name">Pagar con saldo</div><div class="pay-sub">Disponible: ${money(u.balance)}</div></div></div>
+            <div class="check">${ic.check}</div>
+          </div>
+          ${state.paymentMethods.filter(m=>m.enabled).map(m=>`
+          <div class="pay-option ${payment===m.id?'selected':''}" data-action="setPaymentMethod" data-pm="${m.id}">
+            <div class="pl"><div class="pay-icon">${ic.cart}</div><div><div class="pay-name">${esc(m.name)}</div><div class="pay-sub">Pago manual</div></div></div>
+            <div class="check">${ic.check}</div>
+          </div>`).join('')}
+          ${ (()=>{ const m = state.paymentMethods.find(x=>x.id===payment); return m ? `<div class="auth-hint" style="white-space:pre-wrap;">${esc(m.details)||'Sin instrucciones adicionales.'}</div>
+          <div class="field" style="margin-top:12px;"><label>ID de la transacción (Binance Pay u otro)</label><input id="purchase-ref" class="input" placeholder="Ej: 1234567890"></div>` : ''; })() }
+
+          <div class="field" style="margin-top:14px;"><label>Código de descuento</label>
+            <div style="display:flex;gap:8px;">
+              <input id="purchase-coupon" class="input" placeholder="Ej: BIENVENIDA10" value="${esc(state.purchase.couponInput)}" ${state.purchase.couponCode?'disabled':''}>
+              ${ state.purchase.couponCode
+                ? `<button class="btn btn-ghost btn-sm" data-action="removeCoupon">Quitar</button>`
+                : `<button class="btn btn-outline btn-sm" data-action="applyCoupon" ${state.busy?'disabled':''}>Aplicar</button>` }
+            </div>
+            ${state.purchase.couponErr ? `<div style="font-size:11.5px;color:var(--danger);margin-top:6px;">${esc(state.purchase.couponErr)}</div>` : ''}
+            ${state.purchase.couponCode ? `<div style="font-size:11.5px;color:var(--confirm);margin-top:6px;">${ic.check} Cupón "${esc(state.purchase.couponCode)}" aplicado</div>` : ''}
+          </div>
+
+          ${ discount>0 ? `
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim);margin-top:14px;"><span>Subtotal</span><span>${money(subtotal)}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--confirm);margin-top:4px;"><span>Descuento</span><span>-${money(discount)}</span></div>
+          ` : '' }
+          <div class="total-bar" style="margin-top:${discount>0?'8px':'16px'};"><span>${ic.bag} Total</span><span>${money(total)}</span></div>
+          ${ payment==='balance' && u.balance<total ? `<div class="auth-err">Saldo insuficiente. <b style="cursor:pointer;" data-action="goto" data-view="profile">Agrega saldo aquí</b>.</div>` : ''}
+        ` : ''}
+      </div>
+      <div class="modal-foot glass-foot">
+        ${step>1 ? `<button class="btn btn-ghost" data-action="purchasePrev">Atrás</button>` : ''}
+        ${step<3 ? `<button class="btn btn-confirm" data-action="purchaseNext">Continuar</button>` : (
+          payment==='balance'
+            ? `<button class="btn btn-confirm" data-action="confirmPurchase" ${(u.balance<total||state.busy)?'disabled':''}>${ic.shield} ${state.busy?'Procesando…':'Pagar ahora'}</button>`
+            : `<button class="btn btn-confirm" data-action="notifyManualPayment" ${state.busy?'disabled':''}>${ic.headset} ${state.busy?'Creando pedido…':'Notificar pago por WhatsApp'}</button>`
+        )}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBalanceModal(){
+  const u = getUser();
+  const enabled = state.paymentMethods.filter(m=>m.enabled);
+  const method = enabled.find(m=>m.id===state.balanceMethod);
+  return `<div class="overlay" data-action="closeModalBg">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-head"><h3>${ic.wallet} Agregar saldo</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">Saldo actual: <b style="color:var(--text);">${money(u.balance)}</b></div>
+        ${ !enabled.length ? `
+          <div class="empty-state">${ic.wallet}<h3>Sin métodos de pago</h3><p>El propietario aún no configuró ningún método para recargar saldo.</p></div>
+        ` : `
+          <div style="font-size:12.5px;font-weight:700;color:var(--text-dim);margin-bottom:10px;">MÉTODO</div>
+          ${enabled.map(m=>`
+          <div class="pay-option ${state.balanceMethod===m.id?'selected':''}" data-action="setBalanceMethod" data-bm="${m.id}">
+            <div class="pl"><div class="pay-icon">${ic.cart}</div><div><div class="pay-name">${esc(m.name)}</div><div class="pay-sub">Requiere confirmación</div></div></div>
+            <div class="check">${ic.check}</div>
+          </div>`).join('')}
+
+          <div class="field" style="margin-top:14px;"><label>Monto a agregar (USD)</label><input id="bal-amt" type="number" min="0" step="0.01" class="input" placeholder="10.00"></div>
+          <div class="auth-hint" style="white-space:pre-wrap;">${esc(method?method.details:'')||'Sin instrucciones adicionales.'}</div>
+          <div class="field"><label>ID de la transacción</label><input id="bal-ref" class="input" placeholder="Ej: 1234567890"></div>
+          <div style="font-size:11.5px;color:var(--text-faint);">Tu saldo se acreditará cuando confirmemos el pago con ese ID.</div>
+        `}
+      </div>
+      ${ enabled.length ? `
+      <div class="modal-foot">
+        <button class="btn btn-confirm" style="width:100%;" data-action="submitTopupRequest" ${state.busy?'disabled':''}>${ic.headset} ${state.busy?'Enviando…':'Enviar solicitud de recarga'}</button>
+      </div>` : '' }
+    </div>
+  </div>`;
+}
+
+function renderPaymentMethodFormModal(){
+  const f = state.pmForm;
+  return `<div class="overlay" data-action="closeModalBg">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-head"><h3>${ic.wallet} ${f.id?'Editar método':'Nuevo método de pago'}</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Nombre</label><input id="pm-name" class="input" value="${esc(f.name)}" placeholder="Ej: Pago móvil"></div>
+        <div class="field"><label>Instrucciones para el cliente</label><textarea id="pm-details" class="input" placeholder="Banco, número, titular, etc.">${esc(f.details)}</textarea></div>
+        <div class="toggle-row"><div class="toggle ${f.enabled?'on':''}" data-action="togglePmEnabled"></div> Visible para los clientes</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-action="closeModal">Cancelar</button>
+        <button class="btn btn-accent" data-action="savePaymentMethodForm">Guardar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCouponFormModal(){
+  const f = state.couponForm;
+  return `<div class="overlay" data-action="closeModalBg">
+    <div class="modal" style="max-width:460px;">
+      <div class="modal-head"><h3>${ic.tagIcon} ${f.id?'Editar cupón':'Nuevo cupón'}</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Código</label><input id="cp-code" class="input" style="text-transform:uppercase;" value="${esc(f.code)}" placeholder="Ej: BIENVENIDA10"></div>
+        <div class="field"><label>Tipo de descuento</label>
+          <select id="cp-type" class="input">
+            <option value="percent" ${f.type==='percent'?'selected':''}>Porcentaje (%)</option>
+            <option value="fixed" ${f.type==='fixed'?'selected':''}>Monto fijo ($)</option>
+          </select>
+        </div>
+        <div class="field"><label>Valor</label><input id="cp-value" type="number" min="0" step="0.01" class="input" value="${f.value}" placeholder="Ej: 10"></div>
+        <div class="field"><label>Usos máximos (vacío = ilimitado)</label><input id="cp-max" type="number" min="1" class="input" value="${f.max_uses!=null?f.max_uses:''}" placeholder="Ej: 50"></div>
+        <div class="field"><label>Fecha de vencimiento (vacío = sin vencimiento)</label><input id="cp-expires" type="date" class="input" value="${f.expires_at}"></div>
+        <div class="toggle-row"><div class="toggle ${f.active?'on':''}" data-action="toggleCouponFormActive"></div> Activo</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-action="closeModal">Cancelar</button>
+        <button class="btn btn-accent" data-action="saveCouponForm">Guardar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderProductFormModal(){
+  const f = state.productForm;
+  return `<div class="overlay" data-action="closeModalBg">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-head"><h3>${ic.bag} ${f.id?'Editar producto':'Nuevo producto'}</h3><button class="close-x" data-action="closeModal">${ic.x}</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Nombre</label><input id="pf-name" class="input" value="${esc(f.name)}" placeholder="Ej: Nombre del producto"></div>
+        <div class="field"><label>Categoría</label>
+          <select id="pf-cat" class="input">
+            ${ (f.category && !state.categories.find(c=>c.name===f.category)) ? `<option value="${esc(f.category)}" selected>${esc(f.category)} (actual)</option>` : '' }
+            ${state.categories.map(c=>`<option value="${esc(c.name)}" ${f.category===c.name?'selected':''}>${esc(c.name)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Etiqueta destacada</label>
+          <select id="pf-featured" class="input">
+            <option value="" ${!f.featured?'selected':''}>Ninguna</option>
+            <option value="bestseller" ${f.featured==='bestseller'?'selected':''}>Más vendido</option>
+            <option value="new" ${f.featured==='new'?'selected':''}>Nuevo</option>
+            <option value="sale" ${f.featured==='sale'?'selected':''}>En oferta</option>
+          </select>
+        </div>
+        <div class="field"><label>Descripción</label><textarea id="pf-desc" class="input" placeholder="Describe el producto...">${esc(f.description)}</textarea></div>
+        <div class="field">
+          <label>Imagen del producto</label>
+          <input type="file" id="pf-img-file" accept="image/*" data-action="pickProductImageFile" class="input" style="padding:9px;">
+          <div id="pf-img-preview-wrap" style="display:${f.image?'block':'none'};margin-top:10px;">
+            <img id="pf-img-preview" src="${esc(f.image||'')}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border);display:block;">
+            <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="clearProductImage">${ic.trash} Quitar imagen</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Elige una foto desde tu teléfono (cámara o galería). Máx. 5MB.</div>
+        </div>
+        <div class="toggle-row"><div class="toggle ${f.verified?'on':''}" data-action="toggleVerified"></div> Marcar como verificado</div>
+        <div class="field">
+          <label>Planes / presentaciones y precios</label>
+          ${f.variants.map(v=>{
+            const lc = f.id ? state.licenseCounts.find(x=>x.product_id===f.id && x.variant_label===v.label) : null;
+            return `
+            <div class="variant-form-row">
+              <input id="pv-label-${v.id}" class="input" placeholder="Ej: Botella 1L" value="${esc(v.label)}">
+              <input id="pv-price-${v.id}" type="number" min="0" step="0.01" class="input" placeholder="Precio" value="${v.price}">
+              <input id="pv-stock-${v.id}" type="number" min="0" class="input" placeholder="Stock" value="${v.stock===null||v.stock===undefined?'':v.stock}" ${lc&&lc.total>0?'disabled':''}>
+              <button class="icon-chip danger" data-action="removeVariant" data-vid="${v.id}">${ic.trash}</button>
+            </div>
+            ${ lc && lc.total>0 ? `<div style="font-size:11px;color:var(--text-faint);margin:-4px 0 8px;">${ic.key} Controlado por licencias: ${lc.available} disponible(s)</div>` : '' }`;
+          }).join('')}
+          <button class="btn btn-ghost btn-sm" data-action="addVariant">${ic.plus} Agregar plan</button>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-action="closeModal">Cancelar</button>
+        <button class="btn btn-accent" data-action="saveProductForm" ${state.busy?'disabled':''}>${state.busy?'Subiendo imagen…':'Guardar producto'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderProductReviews(productId){
+  const rs = state.reviews.filter(r=>r.product_id===productId);
+  const rating = productRating(productId);
+  return `
+  <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="font-size:12.5px;font-weight:700;color:var(--text-dim);">RESEÑAS</span>
+      ${rating.count ? `<span class="rating-chip">${ic.star} ${rating.avg.toFixed(1)} <span>(${rating.count})</span></span>` : `<span style="font-size:11.5px;color:var(--text-faint);">Sin reseñas todavía</span>`}
+    </div>
+    ${rs.slice(0,4).map(r=>`
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <b style="font-size:13px;">${esc(r.username)}</b>
+          <span style="color:var(--warn);font-size:11px;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+        </div>
+        ${r.comment ? `<div style="font-size:12.5px;color:var(--text-dim);margin-top:2px;">${esc(r.comment)}</div>` : ''}
+      </div>`).join('')}
+  </div>`;
+}
+function renderFavoritesView(){
+  const u = getUser();
+  if(!u) { state.view='login'; return renderAuth('login'); }
+  const favProducts = state.products.filter(p=>state.favorites.includes(p.id));
+  return `
+  <div class="section-title">${ic.heart} Tus favoritos</div>
+  <div class="section-sub">Productos que has guardado para después</div>
+  ${ favProducts.length ? `<div class="grid">${favProducts.map(renderProductCard).join('')}</div>` : `<div class="empty-state">${ic.heart}<h3>Sin favoritos todavía</h3><p>Toca el corazón de cualquier producto para guardarlo aquí.</p></div>` }
+  `;
+}
+
+function renderProfile(){
+  const u = getUser();
+  if(!u) { state.view='login'; return renderAuth('login'); }
+  const myOrders = state.purchases.filter(p=>p.user_id===u.id);
+  return `
+  <div class="profile-grid">
+    <div>
+      <div class="balance-card">
+        <div class="lbl">${ic.wallet} TU SALDO</div>
+        <div class="amt">${money(u.balance)}</div>
+        <button class="btn" style="background:#04121F;color:#fff;width:100%;justify-content:center;" data-action="openAddBalance">${ic.plus} Agregar saldo</button>
+      </div>
+      <div class="info-card">
+        <div class="info-row"><span>Usuario</span><span>${esc(u.username)}</span></div>
+        <div class="info-row"><span>Correo</span><span>${esc(u.email)}</span></div>
+        <div class="info-row"><span>Rol</span><span>${roleLabel(u)}</span></div>
+        <div class="info-row"><span>Miembro desde</span><span>${fmtDate(u.created_at)}</span></div>
+      </div>
+      <div class="info-card">
+        <div class="field" style="margin-bottom:8px;"><label>Teléfono</label><input id="pf-phone" class="input" value="${esc(u.phone||'')}" placeholder="+58..."></div>
+        <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;" data-action="savePhone">Guardar teléfono</button>
+      </div>
+      <div class="info-card">
+        <h4 style="margin-bottom:10px;font-size:14px;">${ic.wallet} Historial de saldo</h4>
+        ${ (()=>{ const mine = state.balanceHistory.filter(t=>t.user_id===u.id);
+          return mine.length ? mine.slice(0,10).map(t=>`
+            <div class="info-row">
+              <span>${t.type==='topup'?'Depósito':t.type==='purchase'?'Compra':'Ajuste'} · ${fmtDate(t.created_at)}</span>
+              <span style="color:${t.amount<0?'var(--danger)':'var(--confirm)'};font-weight:700;">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</span>
+            </div>`).join('') : `<div style="font-size:12.5px;color:var(--text-faint);">Sin movimientos todavía.</div>`;
+        })() }
+      </div>
+    </div>
+    <div>
+      <h2 style="margin-bottom:16px;">${ic.bag} Mis pedidos</h2>
+      ${myOrders.length ? myOrders.map(o=>`
+        <div class="order-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="order-dot"></div>
+            <div class="order-info">
+              <b>${esc(o.product_name)}</b>
+              <div>${esc(o.variant_label)} · ×${o.qty} · ${esc(o.payment_method || 'Saldo')} · ${fmtDate(o.created_at)}</div>
+              ${ (o.payment_method==='Saldo' || o.status!=='Pendiente') && o.license_codes && o.license_codes.length ? `<div style="margin-top:6px;font-family:monospace;font-size:12px;color:var(--confirm);background:rgba(22,199,154,.08);border:1px solid rgba(22,199,154,.25);border-radius:7px;padding:6px 9px;display:inline-block;">${o.license_codes.map(esc).join(', ')}</div>` : (o.license_codes && o.license_codes.length ? `<div style="margin-top:6px;font-size:11.5px;color:var(--text-faint);">Tu código se mostrará aquí cuando confirmemos tu pago.</div>` : '') }
+            </div>
+            <span class="status-pill status-${o.status}">${o.status}</span>
+            <div class="order-price">${money(o.price)}</div>
+          </div>
+          ${renderOrderProgress(o.status)}
+          ${ o.status==='Entregado' ? (()=>{
+              const mine = state.reviews.find(r=>r.product_id===o.product_id && r.user_id===u.id);
+              return `<button class="btn btn-outline btn-sm" style="margin-top:12px;align-self:flex-start;" data-action="openReviewForm" data-pid="${o.product_id}" data-pname="${esc(o.product_name)}">${ic.star} ${mine?'Editar mi reseña':'Dejar reseña'}</button>`;
+            })() : '' }
+        </div>`).join('') : `<div class="empty-state">${ic.box}<h3>Aún no tienes pedidos</h3><p>Explora el catálogo y realiza tu primera compra.</p></div>`}
+    </div>
+  </div>`;
+}
+
+function renderOrderProgress(status){
+  if(status==='Cancelado'){
+    return `<div style="margin-top:12px;padding:8px 12px;border-radius:9px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--danger);font-size:12px;font-weight:700;">Pedido cancelado</div>`;
+  }
+  const steps = ['Pendiente','Enviado','Entregado'];
+  const current = Math.max(0, steps.indexOf(status));
+  return `<div style="display:flex;align-items:flex-start;gap:0;margin-top:14px;padding:0 4px;">
+    ${steps.map((s,i)=>`
+      <div style="display:flex;align-items:center;${i<steps.length-1?'flex:1;':''}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span class="step-dot ${i<current?'done':i===current?'current':''}" style="width:22px;height:22px;font-size:10px;">${i<current?ic.check:i+1}</span>
+          <span style="font-size:9.5px;color:${i<=current?'var(--text-dim)':'var(--text-faint)'};white-space:nowrap;">${s}</span>
+        </div>
+        ${i<steps.length-1?`<div style="flex:1;height:2px;background:${i<current?'var(--confirm)':'var(--border)'};margin:0 4px 15px;"></div>`:''}
+      </div>`).join('')}
+  </div>`;
+}
+
+const ADMIN_SECTIONS = [
+  { key:'resumen',    label:'Resumen',          icon: () => ic.check,  count: () => null,                                                       ownerOnly:false, render: () => renderAdminStats() },
+  { key:'products',   label:'Productos',        icon: () => ic.bag,    count: () => state.products.length,                                      ownerOnly:false, render: () => renderAdminProducts() },
+  { key:'categories', label:'Categorías',       icon: () => ic.tagIcon,count: () => state.categories.length,                                    ownerOnly:false, render: () => renderAdminCategories() },
+  { key:'users',      label:'Usuarios',         icon: () => ic.user,   count: () => state.users.length,                                         ownerOnly:false, render: () => renderAdminUsers() },
+  { key:'orders',     label:'Pedidos',          icon: () => ic.cart,   count: () => state.purchases.length,                                     ownerOnly:false, render: () => renderAdminOrders() },
+  { key:'logins',     label:'Accesos',          icon: () => ic.shield, count: () => state.logins.length,                                        ownerOnly:false, render: () => renderAdminLogins() },
+  { key:'visits',     label:'Visitas',          icon: () => ic.eye,    count: () => state.visitStats ? state.visitStats.total : null,           ownerOnly:false, render: () => renderAdminVisits() },
+  { key:'licenses',   label:'Licencias',        icon: () => ic.key,    count: () => state.licenses.length,                                      ownerOnly:false, render: () => renderAdminLicenses() },
+  { key:'coupons',    label:'Cupones',          icon: () => ic.tagIcon,count: () => state.coupons.length,                                       ownerOnly:false, render: () => renderAdminCoupons() },
+  { key:'balances',   label:'Saldo',            icon: () => ic.wallet, count: () => null,                                                       ownerOnly:true,  render: () => renderAdminBalances() },
+  { key:'topups',     label:'Recargas',         icon: () => ic.wallet, count: () => state.topupRequests.filter(r=>r.status==='Pendiente').length, ownerOnly:true,  render: () => renderAdminTopups() },
+  { key:'payments',   label:'Métodos de pago',  icon: () => ic.cart,   count: () => state.paymentMethods.length,                                ownerOnly:true,  render: () => renderAdminPayments() },
+  { key:'logo',       label:'Logo',             icon: () => ic.chev,  count: () => null,                                                       ownerOnly:true,  render: () => renderAdminLogo() },
+];
+
+function openAdminSection(key){
+  state.adminTab = key;
+  state.modal = 'adminSection';
+  state.__keepScroll = false;
+  render();
+}
+
+function renderAdmin(){
+  const u = getUser();
+  if(!u || !isAdmin()){
+    return `<div class="empty-state">${ic.shield}<h3>Acceso restringido</h3><p>Esta sección es solo para administradores.</p></div>`;
+  }
+  const sections = ADMIN_SECTIONS.filter(s=>!s.ownerOnly || isOwner());
+  return `
+  <div class="admin-head"><h2>${ic.crown} Panel de administración</h2></div>
+  <div class="admin-menu-grid">
+    ${sections.map(s=>{
+      const count = s.count();
+      return `<div class="admin-menu-tile" data-action="openAdminSection" data-t="${s.key}">
+        <div class="tile-icon">${s.icon()}</div>
+        <div class="tile-label">${s.label}</div>
+        ${count!=null ? `<div class="tile-count">${count}</div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderAdminSectionModal(){
+  const section = ADMIN_SECTIONS.find(s=>s.key===state.adminTab);
+  if(!section) return '';
+  return `<div class="overlay glass-overlay" data-action="closeModalBg">
+    <div class="modal glass-modal" style="max-width:760px;">
+      <div class="modal-head glass-head">
+        <h3>${section.icon()} ${section.label}</h3>
+        <button class="close-x" data-action="closeModal">${ic.x}</button>
+      </div>
+      <div class="modal-body">
+        ${section.render()}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminProducts(){
+  const q = state.adminSearch.products.trim().toLowerCase();
+  const list = q ? state.products.filter(p=> (p.name||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q)) : state.products;
+  return `
+  ${ state.products.length ? `<div class="search-bar" style="margin-top:0;margin-bottom:14px;">${ic.search}<input id="admin-search-products" class="input" style="border:none;background:transparent;padding:0;" placeholder="Buscar por nombre o categoría..." value="${esc(state.adminSearch.products)}"></div>` : '' }
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+    <button class="btn btn-accent btn-sm" data-action="newProduct">${ic.plus} Nuevo producto</button>
+  </div>
+  ${ !state.products.length ? renderEmptyCatalog() : (!list.length ? `<div class="empty-state">${ic.search}<h3>Sin resultados</h3></div>` : `<div class="grid">${list.map(p=>`
+    <div class="card">
+      <div class="card-img">${renderProductImage(p)}</div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-cat">${esc(p.category)}</span>
+          ${p.verified?`<span class="badge badge-verified">${ic.check} Verificado</span>`:''}
+          ${p.featured==='bestseller' ? `<span class="badge badge-bestseller">${ic.flame} Más vendido</span>` : ''}
+          ${p.featured==='new' ? `<span class="badge badge-new">${ic.x} Nuevo</span>` : ''}
+          ${p.featured==='sale' ? `<span class="badge badge-sale">${ic.tagIcon} En oferta</span>` : ''}
+        </div>
+        <div class="card-title">${esc(p.name)}</div>
+        <div class="card-desc">${esc(p.description||'Sin descripción')}</div>
+        <div style="font-size:12px;color:var(--text-faint);">${p.variants.length} plan(es) · desde ${money(lowestPrice(p))}</div>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" style="flex:1;" data-action="editProduct" data-id="${p.id}">${ic.edit} Editar</button>
+          ${isOwner() ? `<button class="btn btn-danger btn-sm" style="flex:1;" data-action="deleteProduct" data-id="${p.id}">${ic.trash} Eliminar</button>` : ''}
+        </div>
+      </div>
+    </div>`).join('')}</div>`) }`;
+}
+
+function computeStats(){
+  const totalRevenue = state.purchases.reduce((s,o)=>s+Number(o.price),0);
+  const totalOrders = state.purchases.length;
+  const now = new Date();
+  const monthRevenue = state.purchases.filter(o=>{
+    const d = new Date(o.created_at);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).reduce((s,o)=>s+Number(o.price),0);
+  const byProduct = {};
+  state.purchases.forEach(o=>{ byProduct[o.product_name] = (byProduct[o.product_name]||0) + o.qty; });
+  let topProduct = '—', topQty = 0;
+  Object.entries(byProduct).forEach(([name,qty])=>{ if(qty>topQty){ topQty=qty; topProduct=name; } });
+  const totalCustomers = state.users.filter(u=>u.role==='user').length;
+  const avgOrder = totalOrders ? totalRevenue/totalOrders : 0;
+  return { totalRevenue, totalOrders, monthRevenue, topProduct, topQty, totalCustomers, avgOrder };
+}
+
+function computeLowStock(threshold){
+  const items = [];
+  state.products.forEach(p=>{
+    (p.variants||[]).forEach(v=>{
+      const stk = effectiveStock(p.id, v.label, v.stock);
+      if(stk!=null && stk<=threshold) items.push({ product:p.name, variant:v.label, stock:stk });
+    });
+  });
+  return items;
+}
+function renderAdminStats(){
+  const s = computeStats();
+  const lowStock = computeLowStock(2);
+  return `
+  ${lowStock.length ? `<div class="banner">${ic.alert}
+    <div><b>Stock bajo:</b> ${lowStock.map(i=>`${esc(i.product)} (${esc(i.variant)}) — ${i.stock<=0?'agotado':i.stock+' disp.'}`).join(' · ')}</div>
+  </div>` : ''}
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">${ic.wallet} Ingresos totales</div><div class="stat-value">${money(s.totalRevenue)}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.bag} Pedidos totales</div><div class="stat-value">${s.totalOrders}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.chev} Ingresos este mes</div><div class="stat-value">${money(s.monthRevenue)}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.flame} Más vendido</div><div class="stat-value" style="font-size:15px;">${esc(s.topProduct)} ${s.topQty?`<small>(${s.topQty} und.)</small>`:''}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.user} Clientes registrados</div><div class="stat-value">${s.totalCustomers}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.tagIcon} Ticket promedio</div><div class="stat-value">${money(s.avgOrder)}</div></div>
+  </div>`;
+}
+
+function renderAdminCategories(){
+  return `
+  <div class="cat-add-row">
+    <input id="cat-new-name" class="input" placeholder="Nombre de la nueva categoría">
+    <button class="btn btn-accent btn-sm" data-action="addCategory">${ic.plus} Agregar</button>
+  </div>
+  ${ state.categories.length ? state.categories.map(c=>`
+    <div class="cat-chip">
+      <span>${esc(c.name)}</span>
+      <button class="icon-chip danger" data-action="deleteCategory" data-id="${c.id}" style="${isOwner()?'':'display:none;'}">${ic.trash}</button>
+    </div>`).join('') : `<div class="empty-state">${ic.box}<h3>Sin categorías</h3><p>Agrega la primera arriba.</p></div>` }
+  `;
+}
+
+function renderAdminBalances(){
+  return `
+  <div class="table-wrap"><table>
+    <thead><tr><th>Usuario</th><th>Saldo actual</th><th>Ajuste manual (Owner)</th></tr></thead>
+    <tbody>
+      ${state.users.map(u=>`
+      <tr>
+        <td>${esc(u.username)}<br><span style="color:var(--text-faint);font-size:11.5px;">${esc(u.email)}</span></td>
+        <td>${money(u.balance)}</td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <input id="adj-amt-${u.id}" type="number" step="0.01" class="input" style="width:100px;padding:7px 9px;font-size:12.5px;" placeholder="+/- monto">
+            <input id="adj-reason-${u.id}" class="input" style="width:150px;padding:7px 9px;font-size:12.5px;" placeholder="Motivo (opcional)">
+            <button class="btn btn-accent btn-sm" data-action="adjustBalance" data-id="${u.id}">Aplicar</button>
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>
+  <h3 style="margin:24px 0 12px;font-size:16px;">Historial reciente</h3>
+  ${ state.balanceHistory.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Usuario</th><th>Monto</th><th>Tipo</th><th>Motivo</th><th>Fecha</th></tr></thead>
+    <tbody>
+      ${state.balanceHistory.map(t=>`
+      <tr>
+        <td>${esc((state.users.find(u=>u.id===t.user_id)||{}).username || '—')}</td>
+        <td style="color:${t.amount<0?'var(--danger)':'var(--confirm)'};font-weight:700;">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</td>
+        <td>${t.type==='topup'?'Depósito':t.type==='purchase'?'Compra':'Ajuste'}</td>
+        <td>${esc(t.reason||'—')}</td>
+        <td>${fmtDate(t.created_at)}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>` : `<div class="empty-state">${ic.wallet}<h3>Sin movimientos aún</h3></div>` }
+  `;
+}
+
+function renderAdminPayments(){
+  return `
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+    <button class="btn btn-accent btn-sm" data-action="newPaymentMethod">${ic.plus} Nuevo método</button>
+  </div>
+  ${ state.paymentMethods.length ? state.paymentMethods.map(m=>`
+    <div class="cat-chip" style="align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:14px;">${esc(m.name)} ${m.enabled?'<span class="ok-pill">Visible</span>':'<span class="ban-pill">Oculto</span>'}</div>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px;white-space:pre-wrap;">${esc(m.details)||'Sin instrucciones.'}</div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" data-action="togglePaymentMethod" data-id="${m.id}">${m.enabled?'Ocultar':'Mostrar'}</button>
+        <button class="icon-chip" data-action="editPaymentMethod" data-id="${m.id}">${ic.edit}</button>
+        <button class="icon-chip danger" data-action="deletePaymentMethod" data-id="${m.id}">${ic.trash}</button>
+      </div>
+    </div>`).join('') : `<div class="empty-state">${ic.box}<h3>Sin métodos de pago</h3><p>Agrega el primero arriba (transferencia, pago móvil, etc.).</p></div>` }
+  `;
+}
+
+function renderAdminCoupons(){
+  return `
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+    <button class="btn btn-accent btn-sm" data-action="newCoupon">${ic.plus} Nuevo cupón</button>
+  </div>
+  ${ state.coupons.length ? state.coupons.map(c=>{
+    const expired = c.expires_at && new Date(c.expires_at) < new Date();
+    const usedUp = c.max_uses!=null && c.used_count>=c.max_uses;
+    return `
+    <div class="cat-chip" style="align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:14px;font-family:monospace;">${esc(c.code)}
+          ${c.active && !expired && !usedUp ? '<span class="ok-pill">Activo</span>' : '<span class="ban-pill">Inactivo</span>'}
+        </div>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px;">
+          ${c.type==='percent' ? c.value+'% de descuento' : money(c.value)+' de descuento'}
+          · Usado ${c.used_count}${c.max_uses!=null?'/'+c.max_uses:''} veces
+          ${c.expires_at ? ' · Vence '+fmtDate(c.expires_at) : ''}
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" data-action="toggleCouponActive" data-id="${c.id}">${c.active?'Desactivar':'Activar'}</button>
+        <button class="icon-chip" data-action="editCoupon" data-id="${c.id}">${ic.edit}</button>
+        <button class="icon-chip danger" data-action="deleteCoupon" data-id="${c.id}">${ic.trash}</button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="empty-state">${ic.tagIcon}<h3>Sin cupones</h3><p>Crea el primero arriba para ofrecer descuentos.</p></div>` }
+  `;
+}
+
+function renderAdminTopups(){
+  if(!state.topupRequests.length) return `<div class="empty-state">${ic.wallet}<h3>Sin solicitudes de recarga</h3><p>Aparecerán aquí cuando un cliente pague por Binance Pay u otro método manual.</p></div>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Usuario</th><th>Monto</th><th>Método</th><th>ID transacción</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      ${state.topupRequests.map(r=>`
+      <tr>
+        <td>${esc((state.users.find(u=>u.id===r.user_id)||{}).username || '—')}</td>
+        <td style="color:var(--confirm);font-weight:700;">${money(r.amount)}</td>
+        <td>${esc(r.method)}</td>
+        <td>${esc(r.binance_ref||'—')}</td>
+        <td>${fmtDate(r.created_at)}</td>
+        <td><span class="status-pill status-${r.status==='Confirmado'?'Entregado':r.status==='Rechazado'?'Cancelado':'Pendiente'}">${r.status}</span></td>
+        <td><div class="row-actions">
+          ${r.status==='Pendiente' ? `
+            <button class="btn btn-confirm btn-sm" data-action="confirmTopupRequest" data-id="${r.id}">${ic.check} Confirmar</button>
+            <button class="btn btn-danger btn-sm" data-action="rejectTopupRequest" data-id="${r.id}">${ic.x} Rechazar</button>
+          ` : '—'}
+        </div></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function renderAdminLicenses(){
+  if(!state.products.length) return `<div class="empty-state">${ic.key}<h3>Primero agrega un producto</h3><p>Las licencias se asignan a un producto y a uno de sus planes.</p></div>`;
+  const selectedProduct = state.products.find(p=>p.id===state.licenseProductId) || state.products[0];
+  const variants = selectedProduct.variants || [];
+  const selectedVariant = state.licenseVariantLabel || (variants[0] && variants[0].label) || '';
+  const filtered = state.licenses.filter(l=>l.product_id===selectedProduct.id && l.variant_label===selectedVariant);
+  const q = state.adminSearch.licenses.trim().toLowerCase();
+  const filteredShown = q ? filtered.filter(l=>(l.code||'').toLowerCase().includes(q)) : filtered;
+  const disponibles = filtered.filter(l=>l.status==='disponible').length;
+  const asignadas = filtered.filter(l=>l.status==='asignado').length;
+  return `
+  <div class="field"><label>Producto</label>
+    <select id="lic-product" class="input" data-action="selectLicenseProduct">
+      ${state.products.map(p=>`<option value="${p.id}" ${p.id===selectedProduct.id?'selected':''}>${esc(p.name)}</option>`).join('')}
+    </select>
+  </div>
+  <div class="field"><label>Plan / presentación</label>
+    <select id="lic-variant" class="input" data-action="selectLicenseVariant">
+      ${variants.map(v=>`<option value="${esc(v.label)}" ${v.label===selectedVariant?'selected':''}>${esc(v.label)}</option>`).join('')}
+    </select>
+  </div>
+  <div style="display:flex;gap:18px;margin-bottom:16px;font-size:13px;">
+    <span>Disponibles: <b style="color:var(--confirm);">${disponibles}</b></span>
+    <span>Asignadas: <b style="color:var(--text-dim);">${asignadas}</b></span>
+  </div>
+  <div class="field"><label>Agregar licencias (una por línea)</label>
+    <textarea id="lic-bulk" class="input" placeholder="ABCD-1234-EFGH&#10;WXYZ-5678-IJKL"></textarea>
+  </div>
+  <button class="btn btn-accent btn-sm" style="margin-bottom:20px;" data-action="addLicenses">${ic.plus} Agregar licencias</button>
+  ${ filtered.length ? `<div class="search-bar" style="margin-top:0;margin-bottom:14px;">${ic.search}<input id="admin-search-licenses" class="input" style="border:none;background:transparent;padding:0;" placeholder="Buscar código..." value="${esc(state.adminSearch.licenses)}"></div>` : '' }
+  ${ filteredShown.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Código</th><th>Estado</th><th>Asignado a</th><th>Fecha</th><th></th></tr></thead>
+    <tbody>
+      ${filteredShown.map(l=>`
+      <tr>
+        <td style="font-family:monospace;">${esc(l.code)}</td>
+        <td>${l.status==='disponible'?'<span class="ok-pill">Disponible</span>':'<span class="role-pill role-admin">Asignada</span>'}</td>
+        <td>${esc((state.users.find(u=>u.id===l.assigned_to)||{}).username || '—')}</td>
+        <td>${fmtDate(l.created_at)}</td>
+        <td><button class="icon-chip danger" data-action="deleteLicense" data-id="${l.id}">${ic.trash}</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>` : `<div class="empty-state">${ic.key}<h3>Sin licencias para este plan</h3><p>Agrega las primeras arriba.</p></div>` }
+  `;
+}
+
+function renderAdminUsers(){
+  const iAmOwner = isOwner();
+  const q = state.adminSearch.users.trim().toLowerCase();
+  const filtered = q ? state.users.filter(u=> (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q)) : state.users;
+  const toolbar = `
+    <div class="search-bar" style="margin-top:0;margin-bottom:14px;">
+      ${ic.search}
+      <input id="admin-search-users" class="input" style="border:none;background:transparent;padding:0;" placeholder="Buscar por usuario o correo..." value="${esc(state.adminSearch.users)}">
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+      <button class="btn btn-outline btn-sm" data-action="exportUsersCSV">${ic.user} Exportar CSV</button>
+    </div>`;
+  if(!filtered.length) return toolbar + `<div class="empty-state">${ic.search}<h3>Sin resultados</h3></div>`;
+  return toolbar + `<div class="table-wrap"><table>
+    <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      ${filtered.map(u=>{
+        const pillClass = u.role==='owner'?'role-owner':u.role==='admin'?'role-admin':'role-user';
+        const disabledOwner = u.role==='owner' && !iAmOwner;
+        const actions = iAmOwner ? `
+            <select class="input" style="padding:6px 8px;font-size:12px;width:auto;" data-action="changeUserRole" data-id="${u.id}">
+              <option value="user" ${u.role==='user'?'selected':''}>Cliente</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+              <option value="owner" ${u.role==='owner'?'selected':''}>Owner</option>
+            </select>
+            <button class="btn ${u.banned?'btn-confirm':'btn-danger'} btn-sm" data-action="toggleBan" data-id="${u.id}">${ic.ban} ${u.banned?'Reactivar':'Suspender'}</button>
+          ` : `
+            <button class="btn btn-ghost btn-sm" data-action="toggleAdmin" data-id="${u.id}" ${disabledOwner?'disabled':''}>${u.role==='admin'?'Quitar admin':'Hacer admin'}</button>
+            <button class="btn ${u.banned?'btn-confirm':'btn-danger'} btn-sm" data-action="toggleBan" data-id="${u.id}" ${disabledOwner?'disabled':''}>${ic.ban} ${u.banned?'Reactivar':'Suspender'}</button>
+          `;
+        return `
+      <tr>
+        <td>${esc(u.username)}</td>
+        <td>${esc(u.email)}</td>
+        <td><span class="role-pill ${pillClass}">${roleLabel(u)}</span></td>
+        <td>${money(u.balance)}</td>
+        <td>${u.banned?'<span class="ban-pill">Suspendido</span>':'<span class="ok-pill">Activo</span>'}</td>
+        <td><div class="row-actions">${actions}</div></td>
+      </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function exportCSV(filename, headers, rows){
+  const esc2 = v => { const s = (v===null||v===undefined)?'':String(v); return '"' + s.replace(/"/g,'""') + '"'; };
+  const lines = [headers.map(esc2).join(',')].concat(rows.map(r=>r.map(esc2).join(',')));
+  const csv = lines.join('\r\n');
+  const blob = new Blob(['\ufeff'+csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportOrdersCSV(){
+  const headers = ['Producto','Plan','Cliente','Cantidad','Total','Metodo','Fecha','Estado','Codigos'];
+  const rows = state.purchases.map(o=>[o.product_name,o.variant_label,o.username,o.qty,o.price,o.payment_method||'Saldo',fmtDate(o.created_at),o.status,(o.license_codes||[]).join('; ')]);
+  exportCSV('pedidos_luxz_store.csv', headers, rows);
+}
+function exportUsersCSV(){
+  const headers = ['Usuario','Correo','Rol','Saldo','Estado','Miembro desde'];
+  const rows = state.users.map(u=>[u.username,u.email,roleLabel(u),u.balance,u.banned?'Suspendido':'Activo',fmtDate(u.created_at)]);
+  exportCSV('usuarios_luxz_store.csv', headers, rows);
+}
+
+function renderAdminOrders(){
+  if(!state.purchases.length) return `<div class="empty-state">${ic.bag}<h3>Sin pedidos todavía</h3><p>Los pedidos de los clientes aparecerán aquí.</p></div>`;
+  const q = state.adminSearch.orders.trim().toLowerCase();
+  const filtered = q ? state.purchases.filter(o=> (o.product_name||'').toLowerCase().includes(q) || (o.username||'').toLowerCase().includes(q) || (o.status||'').toLowerCase().includes(q)) : state.purchases;
+  const toolbar = `
+    <div class="search-bar" style="margin-top:0;margin-bottom:14px;">
+      ${ic.search}
+      <input id="admin-search-orders" class="input" style="border:none;background:transparent;padding:0;" placeholder="Buscar por producto, cliente o estado..." value="${esc(state.adminSearch.orders)}">
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+      <button class="btn btn-outline btn-sm" data-action="exportOrdersCSV">${ic.bag} Exportar CSV</button>
+    </div>`;
+  if(!filtered.length) return toolbar + `<div class="empty-state">${ic.search}<h3>Sin resultados</h3></div>`;
+  return toolbar + `<div class="table-wrap"><table>
+    <thead><tr><th>Producto</th><th>Cliente</th><th>Cant.</th><th>Total</th><th>Pago</th><th>Fecha</th><th>Estado</th></tr></thead>
+    <tbody>
+      ${filtered.map(o=>`
+      <tr>
+        <td>${esc(o.product_name)}<br><span style="color:var(--text-faint);font-size:11.5px;">${esc(o.variant_label)}</span>${ o.license_codes && o.license_codes.length ? `<br><span style="font-family:monospace;font-size:11px;color:var(--confirm);">${o.license_codes.map(esc).join(', ')}</span>` : '' }</td>
+        <td>${esc(o.username)}</td>
+        <td>${o.qty}</td>
+        <td>${money(o.price)}</td>
+        <td>${esc(o.payment_method || 'Saldo')}</td>
+        <td>${fmtDate(o.created_at)}</td>
+        <td>
+          <select class="input" style="padding:6px 8px;font-size:12.5px;" data-action="orderStatus" data-id="${o.id}">
+            ${['Pendiente','Enviado','Entregado','Cancelado'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function renderAdminLogins(){
+  if(!state.logins.length) return `<div class="empty-state">${ic.user}<h3>Sin accesos registrados</h3></div>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Usuario</th><th>Rol</th><th>Fecha</th></tr></thead>
+    <tbody>
+      ${state.logins.map(l=>`
+      <tr><td>${esc(l.username)}</td><td><span class="role-pill ${l.role==='admin'?'role-admin':'role-user'}">${l.role==='admin'?'Admin':'Cliente'}</span></td><td>${fmtDate(l.created_at)}</td></tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function renderAdminVisits(){
+  const s = state.visitStats;
+  if(!s) return `<div class="empty-state">${ic.eye}<h3>Sin datos todavía</h3><p>Las visitas se van registrando a medida que la gente entra a la tienda.</p></div>`;
+  return `<div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">${ic.eye} Visitas totales</div><div class="stat-value">${s.total}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.user} Visitantes únicos</div><div class="stat-value">${s.unique_visitors}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.star} Hoy</div><div class="stat-value">${s.today}</div></div>
+    <div class="stat-card"><div class="stat-label">${ic.bag} Últimos 7 días</div><div class="stat-value">${s.last_7_days}</div></div>
+  </div>`;
+}
+
+/* ---------------- EVENTS ---------------- */
+function attachEvents(){
+  document.getElementById('app').addEventListener('click', onClick);
+}
+function onClick(e){
+  const t = e.target.closest('[data-action]');
+  if(!t){
+    if(state.userMenuOpen){ state.userMenuOpen=false; render(); }
+    return;
+  }
+  const a = t.dataset.action;
+  state.__keepScroll = true;
+
+  if(a==='goto'){
+    state.view = t.dataset.view;
+    state.userMenuOpen=false;
+    if(t.dataset.atab){ state.adminTab = t.dataset.atab; state.modal = 'adminSection'; }
+    state.__keepScroll=false;
+    return render();
+  }
+  if(a==='toggleMenu'){ state.userMenuOpen = !state.userMenuOpen; return render(); }
+  if(a==='login') return doLogin();
+  if(a==='register') return doRegister();
+  if(a==='logout') return doLogout();
+  if(a==='setCategory'){ state.activeCategory = t.dataset.cat; return render(); }
+  if(a==='clearSearch'){ state.searchQuery = ''; return render(); }
+  if(a==='toggleFaq'){ const i = Number(t.dataset.i); state.openFaq = state.openFaq===i ? null : i; return render(); }
+  if(a==='openPurchase'){ state.__keepScroll=false; return openPurchase(t.dataset.id); }
+  if(a==='toggleFavorite') return toggleFavorite(t.dataset.id);
+  if(a==='openReviewForm'){ state.__keepScroll=false; return openReviewForm(t.dataset.pid, t.dataset.pname); }
+  if(a==='setReviewRating') return setReviewRating(Number(t.dataset.n));
+  if(a==='submitReview') return submitReview();
+  if(a==='closeModal'){ state.modal=null; state.productForm=null; return render(); }
+  if(a==='closeModalBg'){
+    if(e.target.classList.contains('overlay')){ state.modal=null; state.productForm=null; return render(); }
+    return;
+  }
+  if(a==='selectVariant') return selectVariant(t.dataset.vid);
+  if(a==='qty') return changeQty(Number(t.dataset.d));
+  if(a==='purchaseNext') return purchaseNext();
+  if(a==='purchasePrev') return purchasePrev();
+  if(a==='setPaymentMethod') return setPaymentMethod(t.dataset.pm);
+  if(a==='applyCoupon') return applyCoupon();
+  if(a==='removeCoupon') return removeCoupon();
+  if(a==='newCoupon'){ state.__keepScroll=false; return openCouponForm(null); }
+  if(a==='editCoupon'){ state.__keepScroll=false; return openCouponForm(t.dataset.id); }
+  if(a==='toggleCouponFormActive') return toggleCouponFormActive();
+  if(a==='saveCouponForm') return saveCouponForm();
+  if(a==='toggleCouponActive') return toggleCouponActive(t.dataset.id);
+  if(a==='deleteCoupon') return deleteCoupon(t.dataset.id);
+  if(a==='notifyManualPayment') return notifyManualPayment();
+  if(a==='confirmPurchase') return confirmPurchase();
+  if(a==='copyCode') return copyCode(t.dataset.code);
+  if(a==='openAddBalance'){ state.__keepScroll=false; return openAddBalance(); }
+  if(a==='setBalanceMethod'){ state.balanceMethod = t.dataset.bm; return render(); }
+  if(a==='submitTopupRequest') return submitTopupRequest();
+  if(a==='confirmTopupRequest') return confirmTopupRequest(t.dataset.id);
+  if(a==='rejectTopupRequest') return rejectTopupRequest(t.dataset.id);
+  if(a==='addLicenses') return addLicenses();
+  if(a==='deleteLicense') return deleteLicense(t.dataset.id);
+  if(a==='exportOrdersCSV') return exportOrdersCSV();
+  if(a==='exportUsersCSV') return exportUsersCSV();
+  if(a==='adjustBalance') return adjustBalance(t.dataset.id);
+  if(a==='savePhone') return savePhone();
+  if(a==='newProduct'){ state.__keepScroll=false; return openProductForm(null); }
+  if(a==='editProduct'){ state.__keepScroll=false; return openProductForm(t.dataset.id); }
+  if(a==='deleteProduct') return deleteProduct(t.dataset.id);
+  if(a==='addVariant') return addVariantRow();
+  if(a==='removeVariant') return removeVariantRow(t.dataset.vid);
+  if(a==='toggleVerified') return toggleVerified();
+  if(a==='saveProductForm') return saveProductForm();
+  if(a==='clearProductImage') return clearProductImage();
+  if(a==='saveSiteLogo') return saveSiteLogo();
+  if(a==='clearSiteLogo') return clearSiteLogo();
+  if(a==='newPaymentMethod'){ state.__keepScroll=false; return openPaymentMethodForm(null); }
+  if(a==='editPaymentMethod'){ state.__keepScroll=false; return openPaymentMethodForm(t.dataset.id); }
+  if(a==='togglePmEnabled') return togglePmEnabled();
+  if(a==='savePaymentMethodForm') return savePaymentMethodForm();
+  if(a==='togglePaymentMethod') return togglePaymentMethod(t.dataset.id);
+  if(a==='deletePaymentMethod') return deletePaymentMethod(t.dataset.id);
+  if(a==='toggleBan') return toggleBan(t.dataset.id);
+  if(a==='toggleAdmin') return toggleAdmin(t.dataset.id);
+  if(a==='addCategory') return addCategory();
+  if(a==='deleteCategory') return deleteCategory(t.dataset.id);
+  if(a==='openAdminSection') return openAdminSection(t.dataset.t);
+  if(a==='fabSupport'){
+    if(WHATSAPP_NUMBER.includes('TU-NUMERO')){ showToast('Falta configurar el número de WhatsApp (WHATSAPP_NUMBER) en el archivo.'); return; }
+    const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(WHATSAPP_MESSAGE);
+    window.open(url, '_blank');
+  }
+  if(a==='social'){
+    const key = t.dataset.key;
+    const url = SOCIAL_LINKS[key];
+    if(!url || url.startsWith('TU-')){ showToast('Falta configurar el enlace de ' + SOCIAL_LABELS[key] + ' (SOCIAL_LINKS) en el archivo.'); return; }
+    window.open(url, '_blank');
+  }
+}
+document.addEventListener('input', function(e){
+  if(e.target.id==='store-search'){ state.searchQuery = e.target.value; state.__keepScroll=true; render(); }
+  if(e.target.id==='admin-search-users'){ state.adminSearch.users = e.target.value; state.__keepScroll=true; render(); }
+  if(e.target.id==='admin-search-orders'){ state.adminSearch.orders = e.target.value; state.__keepScroll=true; render(); }
+  if(e.target.id==='admin-search-products'){ state.adminSearch.products = e.target.value; state.__keepScroll=true; render(); }
+  if(e.target.id==='admin-search-licenses'){ state.adminSearch.licenses = e.target.value; state.__keepScroll=true; render(); }
+});
+document.addEventListener('change', function(e){
+  if(e.target.dataset && e.target.dataset.action==='orderStatus'){
+    setOrderStatus(e.target.dataset.id, e.target.value);
+  }
+  if(e.target.dataset && e.target.dataset.action==='changeUserRole'){
+    changeUserRole(e.target.dataset.id, e.target.value);
+  }
+  if(e.target.dataset && e.target.dataset.action==='selectLicenseProduct'){
+    selectLicenseProduct(e.target.value);
+  }
+  if(e.target.dataset && e.target.dataset.action==='selectLicenseVariant'){
+    selectLicenseVariant(e.target.value);
+  }
+  if(e.target.dataset && e.target.dataset.action==='pickProductImageFile'){
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024){ showToast('La imagen es muy pesada (máx. 5MB).'); e.target.value=''; return; }
+    pendingProductImageFile = file;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = document.getElementById('pf-img-preview');
+      const wrap = document.getElementById('pf-img-preview-wrap');
+      if(img) img.src = ev.target.result;
+      if(wrap) wrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  if(e.target.dataset && e.target.dataset.action==='pickLogoFile'){
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024){ showToast('La imagen es muy pesada (máx. 5MB).'); e.target.value=''; return; }
+    pendingLogoFile = file;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      let img = document.getElementById('logo-preview');
+      if(!img){
+        const iconSpan = document.getElementById('logo-preview-icon');
+        if(iconSpan){
+          iconSpan.outerHTML = '<img id="logo-preview" style="width:100%;height:100%;object-fit:cover;">';
+          img = document.getElementById('logo-preview');
+        }
+      }
+      if(img) img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+init();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
