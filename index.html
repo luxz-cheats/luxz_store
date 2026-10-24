@@ -663,7 +663,7 @@ const TOKEN_HASH = __query.get('token_hash');
 const TOKEN_TYPE = __query.get('type');
 /* Versión de esta copia de la página. Se envía al servidor en cada petición para
    poder desactivar copias antiguas (ver min_app_version en site_settings). */
-const APP_VERSION = 3;
+const APP_VERSION = 4;
 const sb = NEEDS_SETUP ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   global: { headers: { 'X-Client-Info': 'luxz-v' + APP_VERSION } }
 });
